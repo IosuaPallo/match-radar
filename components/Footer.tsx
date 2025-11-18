@@ -62,7 +62,7 @@ export const Footer: React.FC = () => {
                   matches, and player insights.
                 </Typography>
               </motion.div>
-            </Grid>
+            </Grid2>
 
             {/* Quick Links */}
             <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
@@ -95,7 +95,7 @@ export const Footer: React.FC = () => {
                   ))}
                 </Box>
               </motion.div>
-            </Grid>
+            </Grid2>
 
             {/* Leagues */}
             <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
@@ -128,7 +128,7 @@ export const Footer: React.FC = () => {
                   ))}
                 </Box>
               </motion.div>
-            </Grid>
+            </Grid2>
 
             {/* Stats */}
             <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
@@ -151,8 +151,8 @@ export const Footer: React.FC = () => {
                   </Typography>
                 </Box>
               </motion.div>
-            </Grid>
-          </Grid>
+            </Grid2>
+          </Grid2>
 
           {/* Divider */}
           <Box sx={{ borderTop: 1, borderColor: 'divider', py: 3 }}>
