@@ -24,7 +24,7 @@ export const useFavorites = () => {
     }
   };
 
-  const addFavorite = (item: FavoriteItem) => {
+  const addFavorite = (item: Omit<FavoriteItem, 'addedAt'>) => {
     const exists = favorites.some((fav) => fav.id === item.id && fav.type === item.type);
     if (!exists) {
       saveFavorites([...favorites, { ...item, addedAt: Date.now() }]);
@@ -39,7 +39,7 @@ export const useFavorites = () => {
     return favorites.some((fav) => fav.type === type && fav.id === id);
   };
 
-  const toggleFavorite = (item: FavoriteItem) => {
+  const toggleFavorite = (item: Omit<FavoriteItem, 'addedAt'>) => {
     if (isFavorite(item.type, item.id)) {
       removeFavorite(item.type, item.id);
     } else {
