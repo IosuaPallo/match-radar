@@ -22,6 +22,7 @@ import { useMatches } from '@/hooks/useMatches';
 import { useTopScorers } from '@/hooks/useLeagues';
 import { getDateRange } from '@/utils/date';
 import { ArrowForward } from '@mui/icons-material';
+import { Footer } from '@/components/Footer';
 
 const containerVariants = {
   hidden: { opacity: 0 },
