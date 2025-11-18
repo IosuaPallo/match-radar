@@ -2,13 +2,13 @@ import axios, { AxiosInstance } from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api-football-v1.p.rapidapi.com/v3';
 const RAPIDAPI_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '';
-const RAPIDAPI_HOST = process.env.NEXT_PUBLIC_RAPIDAPI_HOST || 'api-football-v1.p.rapidapi.com';
+const RAPIDAPI_HOST = process.env.NEXT_PUBLIC_RAPIDAPI_HOST || 'https://api-football-v1.p.rapidapi.com/v3';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'X-RapidAPI-Key': RAPIDAPI_KEY,
-    'X-RapidAPI-Host': RAPIDAPI_HOST,
+    'x-rapidapi-key': RAPIDAPI_KEY,
+    'x-rapidapi-host': RAPIDAPI_HOST,
   },
 });
 
