@@ -132,7 +132,7 @@ export default function PlayersPage() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <Grid container spacing={2}>
+                <Grid2 container spacing={2}>
                   {filteredPlayers.map((scorer: any, idx: number) => (
                     <Grid item xs={12} sm={6} md={4} key={idx}>
                       <Card
