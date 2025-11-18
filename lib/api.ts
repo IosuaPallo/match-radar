@@ -1,13 +1,10 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
-const API_BASE_URL = process.env.FOOTBALL_DATA_API_BASE_URL || 'https://api.football-data.org/v4';
-const API_KEY = process.env.FOOTBALL_DATA_API_KEY || '';
+// Use local proxy instead of external API (handles CORS and keeps API key server-side)
+const API_BASE_URL = '/api/football';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'X-Auth-Token': API_KEY,
-  },
 });
 
 // Request queue to respect 10 requests per minute rate limit
