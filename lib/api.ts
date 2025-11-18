@@ -77,39 +77,39 @@ apiClient.interceptors.response.use(
 
 export const footballApi = {
   // Matches
-  getMatches: (params: Record<string, any>) =>
-    requestQueue.add(() => apiClient.get('/matches', { params })),
+  getMatches: (params: Record<string, any>, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get('/matches', { params, signal }), signal),
 
-  getMatchesByCompetition: (competitionCode: string, params: Record<string, any> = {}) =>
-    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/matches`, { params })),
+  getMatchesByCompetition: (competitionCode: string, params: Record<string, any> = {}, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/matches`, { params, signal }), signal),
 
-  getMatchDetails: (matchId: number) =>
-    requestQueue.add(() => apiClient.get(`/matches/${matchId}`)),
+  getMatchDetails: (matchId: number, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/matches/${matchId}`, { signal }), signal),
 
   // Teams
-  getTeamsByCompetition: (competitionCode: string) =>
-    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/teams`)),
+  getTeamsByCompetition: (competitionCode: string, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/teams`, { signal }), signal),
 
-  getTeamById: (teamId: number) =>
-    requestQueue.add(() => apiClient.get(`/teams/${teamId}`)),
+  getTeamById: (teamId: number, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/teams/${teamId}`, { signal }), signal),
 
   // Standings
-  getStandingsByCompetition: (competitionCode: string) =>
-    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/standings`)),
+  getStandingsByCompetition: (competitionCode: string, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/standings`, { signal }), signal),
 
   // Scorers/Players
-  getScorersByCompetition: (competitionCode: string) =>
-    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/scorers`)),
+  getScorersByCompetition: (competitionCode: string, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/scorers`, { signal }), signal),
 
-  getPersonById: (personId: number) =>
-    requestQueue.add(() => apiClient.get(`/persons/${personId}`)),
+  getPersonById: (personId: number, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/persons/${personId}`, { signal }), signal),
 
   // Competitions
-  getCompetitions: () =>
-    requestQueue.add(() => apiClient.get('/competitions')),
+  getCompetitions: (signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get('/competitions', { signal }), signal),
 
-  getCompetitionById: (competitionCode: string) =>
-    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}`)),
+  getCompetitionById: (competitionCode: string, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}`, { signal }), signal),
 };
 
 export default apiClient;
