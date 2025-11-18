@@ -169,9 +169,9 @@ export default function Home() {
                     {recentMatches.data.matches.slice(0, 3).map((match) => (
                       <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                         <MatchCard match={match} />
-                      </Grid>
+                      </Grid2>
                     ))}
-                  </Grid>
+                  </Grid2>
                 ) : (
                   <Card>
                     <CardContent sx={{ textAlign: 'center', py: 4 }}>
@@ -222,9 +222,9 @@ export default function Home() {
                     {upcomingMatches.data.matches.slice(0, 3).map((match) => (
                       <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                         <MatchCard match={match} />
-                      </Grid>
+                      </Grid2>
                     ))}
-                  </Grid>
+                  </Grid2>
                 ) : (
                   <Card>
                     <CardContent sx={{ textAlign: 'center', py: 4 }}>
@@ -331,9 +331,9 @@ export default function Home() {
                             </Box>
                           </CardContent>
                         </Card>
-                      </Grid>
+                      </Grid2>
                     ))}
-                  </Grid>
+                  </Grid2>
                 ) : (
                   <Card>
                     <CardContent sx={{ textAlign: 'center', py: 4 }}>
