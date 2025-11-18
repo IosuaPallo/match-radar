@@ -1,57 +1,71 @@
 import { useQuery } from '@tanstack/react-query';
 import { footballApi } from '@/lib/api';
-import { League, ApiResponse } from '@/lib/types';
+import { Competition, StandingResponse, ScorersResponse } from '@/lib/types';
 
-export const useLeagues = (season: number = 2024) => {
+export const useCompetitions = () => {
   return useQuery({
-    queryKey: ['leagues', season],
+    queryKey: ['competitions'],
     queryFn: async () => {
-      const response = await footballApi.getLeagues({ season });
-      return response.data as ApiResponse<League>;
+      const response = await footballApi.getCompetitions();
+      return response.data as { competitions: Competition[] };
     },
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
+    staleTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours
+    retry: 1,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 30000),
   });
 };
 
-export const useTopScorers = (leagueId: number | null, season: number = 2024) => {
+export const useStandings = (competitionCode: string | null) => {
   return useQuery({
-    queryKey: ['top-scorers', leagueId, season],
+    queryKey: ['standings', competitionCode],
     queryFn: async () => {
-      if (!leagueId) return null;
-      const response = await footballApi.getLeagueTopScorers(leagueId, season);
-      return response.data as ApiResponse<any>;
+      if (!competitionCode) return null;
+      const response = await footballApi.getStandingsByCompetition(competitionCode);
+      return response.data as StandingResponse;
     },
-    enabled: !!leagueId,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
+    enabled: !!competitionCode,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
+    retry: 1,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 30000),
   });
 };
 
-export const useTopAssists = (leagueId: number | null, season: number = 2024) => {
+export const useTopScorers = (competitionCode: string | null) => {
   return useQuery({
-    queryKey: ['top-assists', leagueId, season],
+    queryKey: ['top-scorers', competitionCode],
     queryFn: async () => {
-      if (!leagueId) return null;
-      const response = await footballApi.getLeagueTopAssists(leagueId, season);
-      return response.data as ApiResponse<any>;
+      if (!competitionCode) return null;
+      const response = await footballApi.getScorersByCompetition(competitionCode);
+      return response.data as ScorersResponse;
     },
-    enabled: !!leagueId,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
+    enabled: !!competitionCode,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
+    retry: 1,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 30000),
   });
 };
 
-export const useStandings = (leagueId: number | null, season: number = 2024) => {
+export const useTopAssists = (competitionCode: string | null) => {
   return useQuery({
-    queryKey: ['standings', leagueId, season],
+    queryKey: ['top-assists', competitionCode],
     queryFn: async () => {
-      if (!leagueId) return null;
-      const response = await footballApi.getStandings(leagueId, season);
-      return response.data;
+      if (!competitionCode) return null;
+      const response = await footballApi.getScorersByCompetition(competitionCode);
+      // Filter and sort by assists
+      const data = response.data as ScorersResponse;
+      const withAssists = data.scorers.filter((s) => s.assists && s.assists > 0);
+      return {
+        ...data,
+        scorers: withAssists.sort((a, b) => (b.assists || 0) - (a.assists || 0)),
+      };
     },
-    enabled: !!leagueId,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
+    enabled: !!competitionCode,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
+    retry: 1,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 30000),
   });
 };
