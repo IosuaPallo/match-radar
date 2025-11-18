@@ -148,9 +148,9 @@ export default function MatchesPage() {
                   {data.matches.map((match) => (
                     <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                       <MatchCard match={match} />
-                    </Grid>
+                    </Grid2>
                   ))}
-                </Grid>
+                </Grid2>
               </motion.div>
             ) : (
               <Card>
