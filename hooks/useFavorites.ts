@@ -39,11 +39,11 @@ export const useFavorites = () => {
     return favorites.some((fav) => fav.type === type && fav.id === id);
   };
 
-  const toggleFavorite = (item: FavoriteItem) => {
+  const toggleFavorite = (item: Omit<FavoriteItem, 'addedAt'>) => {
     if (isFavorite(item.type, item.id)) {
       removeFavorite(item.type, item.id);
     } else {
-      addFavorite(item);
+      addFavorite(item as FavoriteItem);
     }
   };
 
