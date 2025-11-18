@@ -155,7 +155,7 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                 {/* Match Score */}
                 <Grid2 container spacing={3} sx={{ mb: 3 }}>
                   {/* Home Team */}
-                  <Grid2 xs={12} sm={5}>
+                  <Grid2 size={{ xs: 12, sm: 5 }}>
                     <Box sx={{ textAlign: 'center' }}>
                       {match.homeTeam.crest && (
                         <Image
@@ -173,7 +173,7 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                   </Grid2>
 
                   {/* Score */}
-                  <Grid2 xs={12} sm={2}>
+                  <Grid2 size={{ xs: 12, sm: 2 }}>
                     <Box sx={{ textAlign: 'center', py: 2 }}>
                       <Typography variant="h3" sx={{ fontWeight: 800, color: 'primary.main' }}>
                         {homeGoals !== null ? homeGoals : '-'}
@@ -188,7 +188,7 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                   </Grid2>
 
                   {/* Away Team */}
-                  <Grid2 xs={12} sm={5}>
+                  <Grid2 size={{ xs: 12, sm: 5 }}>
                     <Box sx={{ textAlign: 'center' }}>
                       {match.awayTeam.crest && (
                         <Image
