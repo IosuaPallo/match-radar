@@ -46,9 +46,9 @@ export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
           }}
         >
           <CardContent sx={{ pb: 1, textAlign: 'center' }}>
-            {team.logo && (
+            {team.crest && (
               <Image
-                src={team.logo}
+                src={team.crest}
                 alt={team.name}
                 width={120}
                 height={120}
@@ -63,11 +63,11 @@ export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
               {team.name}
             </Typography>
             <Typography variant="caption" sx={{ opacity: 0.7 }}>
-              {team.country}
+              {team.shortName || team.tla}
             </Typography>
-            {team.founded && (
+            {team.venue && (
               <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mt: 0.5 }}>
-                Founded: {team.founded}
+                Stadium: {team.venue}
               </Typography>
             )}
           </CardContent>
@@ -84,7 +84,7 @@ export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
                   type: 'team',
                   id: team.id,
                   name: team.name,
-                  image: team.logo,
+                  image: team.crest,
                 });
               }}
               color={isTeamFavorite ? 'error' : 'default'}

@@ -1,214 +1,205 @@
-export interface League {
+export interface Competition {
   id: number;
   name: string;
-  country: string;
-  logo: string;
+  code: string;
+  type: string;
+  emblem: string;
+  plan: string;
+}
+
+export interface Area {
+  id: number;
+  name: string;
+  code: string;
   flag: string;
-  season: number;
 }
 
 export interface Team {
   id: number;
   name: string;
-  logo: string;
-  country: string;
-  founded: number;
-  venueId?: number;
+  shortName: string;
+  tla: string;
+  crest: string;
+  address?: string;
+  website?: string;
+  founded?: number;
+  clubColors?: string;
+  venue?: string;
+  lastUpdated?: string;
 }
 
-export interface Venue {
+export interface Squad {
   id: number;
   name: string;
-  address: string;
-  city: string;
-  capacity: number;
-  surface: string;
-  image: string;
-}
-
-export interface Player {
-  id: number;
-  name: string;
-  firstName: string;
-  lastName: string;
-  age: number;
+  position: string;
+  dateOfBirth: string;
   nationality: string;
-  height: string;
-  weight: string;
-  photo: string;
-  role: {
-    primary: string;
-    secondary?: string;
-  };
-  statistics?: PlayerStatistic[];
+  shirtNumber?: number;
 }
 
-export interface PlayerStatistic {
-  team: Team;
-  league: League;
-  season: number;
-  appearances: number;
-  lineups: number;
-  minutes: number;
-  number?: number;
-  position?: string;
-  rating?: number;
-  captain: boolean;
-  goals: number;
-  assists: number;
-  passes?: number;
-  keyPasses?: number;
-  dribbles?: number;
-  fouls?: number;
-  cards?: {
-    yellow: number;
-    red: number;
-  };
-  shots?: number;
-  tackles?: number;
-  blocks?: number;
-  interceptions?: number;
-  clearances?: number;
-  saves?: number;
+export interface TeamDetail extends Team {
+  squad?: Squad[];
+  staff?: any[];
+}
+
+export interface Person {
+  id: number;
+  name: string;
+  dateOfBirth: string;
+  nationality: string;
+  section: string;
 }
 
 export interface Match {
   id: number;
-  league: League;
-  season: number;
-  round: string;
-  date: string;
-  timestamp: number;
-  timezone: string;
-  status: {
-    long: string;
-    short: string;
-    elapsed?: number;
-  };
-  venue: Venue;
+  utcDate: string;
+  status: 'TIMED' | 'LIVE' | 'IN_PLAY' | 'PAUSED' | 'FINISHED' | 'POSTPONED' | 'CANCELLED' | 'SUSPENDED';
+  lastUpdatedAt: string;
+  minute?: number;
+  injuryTime?: number;
+  competition: Competition;
   homeTeam: Team;
   awayTeam: Team;
-  goals: {
-    home: number | null;
-    away: number | null;
+  score: {
+    winner?: 'HOME' | 'AWAY' | 'DRAW';
+    duration: 'REGULAR' | 'EXTRA' | 'PENALTY';
+    fullTime: {
+      home: number | null;
+      away: number | null;
+    };
+    halfTime: {
+      home: number | null;
+      away: number | null;
+    };
+    extraTime: {
+      home: number | null;
+      away: number | null;
+    };
+    penalties: {
+      home: number | null;
+      away: number | null;
+    };
+  };
+  odds?: {
+    msg: string;
+  };
+  goals?: Goal[];
+  bookings?: Booking[];
+  substitutions?: Substitution[];
+  referees: Referee[];
+  season?: {
+    id: number;
+    startDate: string;
+    endDate: string;
+    currentMatchday?: number;
+  };
+  stage?: string;
+  group?: string;
+  lastUpdated?: string;
+}
+
+export interface Goal {
+  minute: number;
+  injuryTime?: number;
+  type: 'PENALTY' | 'OWN_GOAL' | 'REGULAR';
+  player: Person;
+  team: Team;
+  assist?: {
+    player?: Person;
   };
   score: {
-    halftime: {
-      home: number | null;
-      away: number | null;
-    };
-    fulltime: {
-      home: number | null;
-      away: number | null;
-    };
-    extratime?: {
-      home: number | null;
-      away: number | null;
-    };
-    penalty?: {
-      home: number | null;
-      away: number | null;
-    };
+    home: number;
+    away: number;
   };
-  lineups?: Lineup[];
-  events?: MatchEvent[];
-  statistics?: MatchStatistic[];
-  commentary?: Commentary[];
 }
 
-export interface Lineup {
+export interface Booking {
+  minute: number;
+  player: Person;
   team: Team;
-  formation: string;
-  players: LineupPlayer[];
+  card: 'YELLOW' | 'RED';
 }
 
-export interface LineupPlayer {
-  player: Player;
-  position: string;
-  rating?: number;
-  stats?: {
-    goals: number;
-    assists: number;
-    passes: number;
-    dribbles: number;
-    shots: number;
-    tackles: number;
-  };
-}
-
-export interface MatchEvent {
-  time: {
-    elapsed: number;
-    extra?: number;
-  };
-  type: string;
-  detail: string;
-  player: Player;
-  assist?: Player;
+export interface Substitution {
+  minute: number;
+  player: Person;
+  playerOut: Person;
   team: Team;
+  position?: string;
+  positionOut?: string;
 }
 
-export interface MatchStatistic {
-  team: Team;
-  possession: number;
-  shots: {
-    total: number;
-    on: number;
-  };
-  passes: {
-    total: number;
-    accurate: number;
-    percentage: number;
-  };
-  tackles: number;
-  blocks: number;
-  interceptions: number;
-  fouls: number;
-  corners: number;
-  offsides: number;
-  ballPossession: number;
-  xG?: number;
-  xGA?: number;
-}
-
-export interface Commentary {
-  time: number;
-  type: string;
-  text: string;
-  player?: string;
-  team: Team;
-}
-
-export interface TeamStats {
+export interface Referee {
   id: number;
   name: string;
-  logo: string;
-  venue: Venue;
-  form: string;
-  lastMatches?: Match[];
-  nextMatches?: Match[];
-  squad: Player[];
-  statistics?: {
-    wins: number;
-    draws: number;
-    losses: number;
-    goalsFor: number;
-    goalsAgainst: number;
-    goalDifference: number;
-    points: number;
-  };
+  type: string;
+  nationality?: string;
 }
 
-export interface ApiResponse<T> {
-  get: string;
-  parameters: Record<string, any>;
-  errors: Record<string, string>;
-  results: number;
-  paging: {
-    current: number;
-    total: number;
+export interface StandingTable {
+  stage: string;
+  type: string;
+  group?: string;
+  table: Standing[];
+}
+
+export interface Standing {
+  position: number;
+  team: Team;
+  playedGames: number;
+  form?: string;
+  won: number;
+  draw: number;
+  lost: number;
+  points: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+}
+
+export interface Scorer {
+  player: Person;
+  team: Team;
+  playedMatches: number;
+  goals: number;
+  assists: number;
+  penalties?: number;
+}
+
+export interface MatchResponse {
+  matches: Match[];
+  competition?: Competition;
+  filters?: Record<string, any>;
+}
+
+export interface StandingResponse {
+  competition: Competition;
+  season: {
+    id: number;
+    startDate: string;
+    endDate: string;
   };
-  response: T[];
+  standings: StandingTable[];
+}
+
+export interface ScorersResponse {
+  competition: Competition;
+  season: {
+    id: number;
+    startDate: string;
+    endDate: string;
+  };
+  scorers: Scorer[];
+}
+
+export interface TeamsResponse {
+  competition: Competition;
+  season: {
+    id: number;
+    startDate: string;
+    endDate: string;
+  };
+  teams: Team[];
 }
 
 export interface FavoriteItem {

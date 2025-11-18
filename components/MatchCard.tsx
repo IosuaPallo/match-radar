@@ -23,14 +23,18 @@ interface MatchCardProps {
 export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isFinished = match.status.short === 'FT' || match.status.short === 'AET' || match.status.short === 'PEN';
-  const isLive = match.status.short === 'LIVE' || match.status.short === '1H' || match.status.short === '2H';
+  const isFinished = match.status === 'FINISHED';
+  const isLive = match.status === 'LIVE' || match.status === 'IN_PLAY';
+  const isScheduled = match.status === 'TIMED';
 
   const getStatusColor = () => {
     if (isFinished) return 'success';
     if (isLive) return 'error';
     return 'default';
   };
+
+  const homeGoals = match.score.fullTime.home;
+  const awayGoals = match.score.fullTime.away;
 
   return (
     <motion.div
@@ -55,7 +59,7 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
           <CardContent sx={{ p: isMobile ? 2 : 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                {match.league?.name}
+                {match.competition?.name}
               </Typography>
               <Chip
                 label={isLive ? '🔴 LIVE' : isFinished ? 'Finished' : 'Upcoming'}
@@ -77,19 +81,19 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                {formatDate(match.date)}
+                {formatDate(match.utcDate)}
               </Typography>
               <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                {formatTime(match.date)}
+                {formatTime(match.utcDate)}
               </Typography>
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Box sx={{ flex: 1, textAlign: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center', mb: 1 }}>
-                  {match.homeTeam.logo && (
+                  {match.homeTeam.crest && (
                     <Image
-                      src={match.homeTeam.logo}
+                      src={match.homeTeam.crest}
                       alt={match.homeTeam.name}
                       width={32}
                       height={32}
@@ -121,11 +125,11 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
                   }}
                 >
                   {isFinished ? (
-                    `${match.goals.home} - ${match.goals.away}`
+                    `${homeGoals} - ${awayGoals}`
                   ) : isLive ? (
                     <>
                       <span style={{ fontSize: '0.8em', color: 'inherit', opacity: 0.7 }}>
-                        {match.status.elapsed}'
+                        {match.minute}'
                       </span>
                     </>
                   ) : (
@@ -142,9 +146,9 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
                   >
                     {match.awayTeam.name}
                   </Typography>
-                  {match.awayTeam.logo && (
+                  {match.awayTeam.crest && (
                     <Image
-                      src={match.awayTeam.logo}
+                      src={match.awayTeam.crest}
                       alt={match.awayTeam.name}
                       width={32}
                       height={32}
@@ -155,9 +159,9 @@ export const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
               </Box>
             </Box>
 
-            {match.venue?.name && (
+            {match.season && (
               <Typography variant="caption" sx={{ opacity: 0.6, display: 'block', mt: 2 }}>
-                📍 {match.venue.name}
+                📍 Season {match.season.id}
               </Typography>
             )}
           </CardContent>
