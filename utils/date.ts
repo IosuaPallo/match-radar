@@ -50,12 +50,15 @@ export const isTomorrow = (date: string | Date): boolean => {
 };
 
 export const getDateRange = (days: number): { from: string; to: string } => {
-  const from = new Date();
-  const to = new Date();
-  to.setDate(to.getDate() + days);
+  const date1 = new Date();
+  const date2 = new Date();
+  date2.setDate(date2.getDate() + days);
+
+  const fromDate = days < 0 ? date2 : date1;
+  const toDate = days < 0 ? date1 : date2;
 
   return {
-    from: from.toISOString().split('T')[0],
-    to: to.toISOString().split('T')[0],
+    from: fromDate.toISOString().split('T')[0],
+    to: toDate.toISOString().split('T')[0],
   };
 };

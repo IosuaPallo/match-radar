@@ -18,6 +18,10 @@ export const useMatches = (params: UseMatchesParams = {}) => {
       const response = await footballApi.getMatches(params);
       return response.data as ApiResponse<Match>;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };
 
@@ -30,6 +34,10 @@ export const useMatchDetails = (matchId: number | null) => {
       return response.data as ApiResponse<Match>;
     },
     enabled: !!matchId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };
 
@@ -42,6 +50,10 @@ export const useMatchLineups = (matchId: number | null) => {
       return response.data;
     },
     enabled: !!matchId,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };
 
@@ -54,5 +66,9 @@ export const useMatchStatistics = (matchId: number | null) => {
       return response.data;
     },
     enabled: !!matchId,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };
