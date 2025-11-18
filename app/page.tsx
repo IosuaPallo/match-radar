@@ -347,6 +347,8 @@ export default function Home() {
           </motion.div>
         </Box>
       </Container>
+
+      <Footer />
     </Box>
   );
 }
