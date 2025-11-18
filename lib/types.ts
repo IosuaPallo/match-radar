@@ -202,6 +202,18 @@ export interface TeamsResponse {
   teams: Team[];
 }
 
+export interface Player {
+  id: number;
+  name: string;
+  photo?: string;
+  role?: {
+    primary: string;
+  };
+  nationality: string;
+  age: number;
+  height?: string;
+}
+
 export interface FavoriteItem {
   type: 'team' | 'player';
   id: number;
