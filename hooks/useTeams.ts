@@ -11,6 +11,8 @@ export const useTeamById = (teamId: number | null) => {
       return response.data as ApiResponse<any>;
     },
     enabled: !!teamId,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };
 
@@ -23,6 +25,8 @@ export const useTeamPlayers = (teamId: number | null, season: number = 2024) => 
       return response.data as ApiResponse<any>;
     },
     enabled: !!teamId,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };
 
@@ -39,5 +43,7 @@ export const useTeamStatistics = (
       return response.data as ApiResponse<any>;
     },
     enabled: !!leagueId && !!teamId,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };
