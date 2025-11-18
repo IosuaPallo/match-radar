@@ -24,7 +24,7 @@ export const useFavorites = () => {
     }
   };
 
-  const addFavorite = (item: FavoriteItem) => {
+  const addFavorite = (item: Omit<FavoriteItem, 'addedAt'>) => {
     const exists = favorites.some((fav) => fav.id === item.id && fav.type === item.type);
     if (!exists) {
       saveFavorites([...favorites, { ...item, addedAt: Date.now() }]);
