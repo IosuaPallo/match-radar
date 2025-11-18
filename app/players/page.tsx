@@ -134,7 +134,7 @@ export default function PlayersPage() {
               >
                 <Grid2 container spacing={2}>
                   {filteredPlayers.map((scorer: any, idx: number) => (
-                    <Grid item xs={12} sm={6} md={4} key={idx}>
+                    <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
                       <Card
                         sx={{
                           height: '100%',
