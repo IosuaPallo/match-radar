@@ -220,7 +220,7 @@ export default function Home() {
                 ) : upcomingMatches.data?.matches?.length ? (
                   <Grid2 container spacing={2}>
                     {upcomingMatches.data.matches.slice(0, 3).map((match) => (
-                      <Grid item xs={12} sm={6} md={4} key={match.id}>
+                      <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                         <MatchCard match={match} />
                       </Grid>
                     ))}
@@ -273,7 +273,7 @@ export default function Home() {
                 ) : topScorers.data?.scorers?.length ? (
                   <Grid2 container spacing={2}>
                     {topScorers.data.scorers.slice(0, 6).map((scorer: any, idx: number) => (
-                      <Grid item xs={12} sm={6} md={4} key={idx}>
+                      <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
                         <Card
                           sx={{
                             height: '100%',
