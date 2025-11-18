@@ -2,13 +2,22 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api-football-v1.p.rapidapi.com/v3';
 const RAPIDAPI_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '';
-const RAPIDAPI_HOST = process.env.NEXT_PUBLIC_RAPIDAPI_HOST || 'https://api-football-v1.p.rapidapi.com/v3';
+
+// Extract hostname from RAPIDAPI_HOST env var (handle both full URL and hostname)
+let rapidApiHost = process.env.NEXT_PUBLIC_RAPIDAPI_HOST || 'api-football-v1.p.rapidapi.com';
+if (rapidApiHost.includes('http')) {
+  try {
+    rapidApiHost = new URL(rapidApiHost).hostname || 'api-football-v1.p.rapidapi.com';
+  } catch {
+    rapidApiHost = 'api-football-v1.p.rapidapi.com';
+  }
+}
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'x-rapidapi-key': RAPIDAPI_KEY,
-    'x-rapidapi-host': RAPIDAPI_HOST,
+    'x-rapidapi-host': rapidApiHost,
   },
 });
 
