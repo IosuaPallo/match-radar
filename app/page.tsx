@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import {
   Container,
-  Grid,
+
   Typography,
   Box,
   Button,
@@ -12,6 +12,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
+import Grid2 from '@mui/material/Grid2';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
