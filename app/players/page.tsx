@@ -202,9 +202,9 @@ export default function PlayersPage() {
                           </Box>
                         </CardContent>
                       </Card>
-                    </Grid>
+                    </Grid2>
                   ))}
-                </Grid>
+                </Grid2>
               </motion.div>
             ) : (
               <Card>
