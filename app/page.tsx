@@ -12,7 +12,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { MatchCard } from '@/components/MatchCard';
@@ -21,10 +21,10 @@ import { MatchCardSkeleton, LoadingSkeleton } from '@/components/LoadingSkeleton
 import { useMatches } from '@/hooks/useMatches';
 import { useTopScorers } from '@/hooks/useLeagues';
 import { getDateRange } from '@/utils/date';
-import { ArrowForward } from '@mui/icons-material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Footer } from '@/components/Footer';
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -35,7 +35,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
@@ -55,14 +55,14 @@ export default function Home() {
   const recentMatches = useMatches({
     from: recentDateRange.from,
     to: recentDateRange.to,
-    league: selectedLeague,
+    leagueId: selectedLeague,
     status: 'finished',
   });
 
   const upcomingMatches = useMatches({
     from: upcomingDateRange.from,
     to: upcomingDateRange.to,
-    league: selectedLeague,
+    leagueId: selectedLeague,
     status: 'scheduled',
   });
 
@@ -153,7 +153,7 @@ export default function Home() {
                   </Box>
                   <Link href="/matches?tab=recent" style={{ textDecoration: 'none' }}>
                     <Button
-                      endIcon={<ArrowForward />}
+                      endIcon={<ArrowForwardIcon />}
                       sx={{ fontWeight: 600 }}
                     >
                       View All
@@ -166,7 +166,7 @@ export default function Home() {
                 ) : recentMatches.data?.response?.length ? (
                   <Grid container spacing={2}>
                     {recentMatches.data.response.slice(0, 3).map((match) => (
-                      <Grid item xs={12} sm={6} md={4} key={match.id}>
+                      <Grid xs={12} sm={6} md={4} key={match.id}>
                         <MatchCard match={match} />
                       </Grid>
                     ))}
@@ -206,7 +206,7 @@ export default function Home() {
                   </Box>
                   <Link href="/matches?tab=upcoming" style={{ textDecoration: 'none' }}>
                     <Button
-                      endIcon={<ArrowForward />}
+                      endIcon={<ArrowForwardIcon />}
                       sx={{ fontWeight: 600 }}
                     >
                       View All
@@ -259,7 +259,7 @@ export default function Home() {
                   </Box>
                   <Link href="/players" style={{ textDecoration: 'none' }}>
                     <Button
-                      endIcon={<ArrowForward />}
+                      endIcon={<ArrowForwardIcon />}
                       sx={{ fontWeight: 600 }}
                     >
                       View All
