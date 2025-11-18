@@ -16,6 +16,8 @@ export const usePlayers = (params: UsePlayersParams = {}) => {
       const response = await footballApi.getPlayers(params);
       return response.data as ApiResponse<Player>;
     },
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };
 
@@ -28,6 +30,8 @@ export const usePlayerById = (playerId: number | null) => {
       return response.data as ApiResponse<Player>;
     },
     enabled: !!playerId,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };
 
@@ -40,5 +44,7 @@ export const usePlayerStatistics = (playerId: number | null, season: number = 20
       return response.data as ApiResponse<Player>;
     },
     enabled: !!playerId,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };

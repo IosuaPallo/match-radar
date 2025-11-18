@@ -42,14 +42,14 @@ export default function MatchesPage() {
   const recentMatches = useMatches({
     from: recentDateRange.from,
     to: recentDateRange.to,
-    league: selectedLeague,
+    leagueId: selectedLeague,
     status: 'finished',
   });
 
   const upcomingMatches = useMatches({
     from: upcomingDateRange.from,
     to: upcomingDateRange.to,
-    league: selectedLeague,
+    leagueId: selectedLeague,
     status: 'scheduled',
   });
 
