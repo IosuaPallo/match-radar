@@ -26,7 +26,6 @@ interface ThemeProviderProps {
 
 export const EuroThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [mode, setMode] = useState<PaletteMode>('dark');
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -37,14 +36,15 @@ export const EuroThemeProvider: React.FC<ThemeProviderProps> = ({ children }) =>
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         setMode(prefersDark ? 'dark' : 'light');
       }
-      setIsMounted(true);
     }
   }, []);
 
   const toggleTheme = () => {
     setMode((prevMode) => {
       const newMode = prevMode === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('theme-mode', newMode);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('theme-mode', newMode);
+      }
       return newMode;
     });
   };
@@ -173,10 +173,6 @@ export const EuroThemeProvider: React.FC<ThemeProviderProps> = ({ children }) =>
       },
     },
   });
-
-  if (!isMounted) {
-    return <>{children}</>;
-  }
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
