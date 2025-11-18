@@ -146,7 +146,7 @@ export default function MatchesPage() {
               >
                 <Grid2 container spacing={2}>
                   {data.matches.map((match) => (
-                    <Grid item xs={12} sm={6} md={4} key={match.id}>
+                    <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                       <MatchCard match={match} />
                     </Grid>
                   ))}
