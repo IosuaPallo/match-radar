@@ -17,6 +17,7 @@ import { Header } from '@/components/Header';
 import { PlayerCard } from '@/components/PlayerCard';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton';
 import { useTopScorers } from '@/hooks/useLeagues';
+import { Footer } from '@/components/Footer';
 import { Search } from '@mui/icons-material';
 
 const majorEuropeanLeagues = [
