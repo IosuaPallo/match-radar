@@ -167,7 +167,7 @@ export default function Home() {
                 ) : recentMatches.data?.matches?.length ? (
                   <Grid2 container spacing={2}>
                     {recentMatches.data.matches.slice(0, 3).map((match) => (
-                      <Grid xs={12} sm={6} md={4} key={match.id}>
+                      <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                         <MatchCard match={match} />
                       </Grid>
                     ))}
