@@ -12,18 +12,18 @@ import {
 } from '@mui/material';
 
 interface LeagueSelectorProps {
-  selectedLeague: number | null;
-  onLeagueChange: (leagueId: number) => void;
+  selectedLeague: string | null;
+  onLeagueChange: (competitionCode: string) => void;
 }
 
 const majorEuropeanLeagues = [
-  { id: 39, name: 'Premier League (England)' },
-  { id: 140, name: 'La Liga (Spain)' },
-  { id: 61, name: 'Ligue 1 (France)' },
-  { id: 78, name: 'Bundesliga (Germany)' },
-  { id: 135, name: 'Serie A (Italy)' },
-  { id: 2, name: 'Champions League' },
-  { id: 3, name: 'Europa League' },
+  { code: 'PL', name: 'Premier League (England)' },
+  { code: 'PD', name: 'La Liga (Spain)' },
+  { code: 'FL1', name: 'Ligue 1 (France)' },
+  { code: 'BL1', name: 'Bundesliga (Germany)' },
+  { code: 'SA', name: 'Serie A (Italy)' },
+  { code: 'CL', name: 'Champions League' },
+  { code: 'EL', name: 'Europa League' },
 ];
 
 export const LeagueSelector: React.FC<LeagueSelectorProps> = ({ selectedLeague, onLeagueChange }) => {
@@ -36,10 +36,10 @@ export const LeagueSelector: React.FC<LeagueSelectorProps> = ({ selectedLeague, 
           id="league-select"
           value={selectedLeague || ''}
           label="Select League"
-          onChange={(e) => onLeagueChange(e.target.value as number)}
+          onChange={(e) => onLeagueChange(e.target.value as string)}
         >
           {majorEuropeanLeagues.map((league) => (
-            <MenuItem key={league.id} value={league.id}>
+            <MenuItem key={league.code} value={league.code}>
               {league.name}
             </MenuItem>
           ))}
@@ -50,11 +50,11 @@ export const LeagueSelector: React.FC<LeagueSelectorProps> = ({ selectedLeague, 
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
           {majorEuropeanLeagues.map((league) => (
             <Chip
-              key={league.id}
+              key={league.code}
               label={league.name.split('(')[0].trim()}
-              onClick={() => onLeagueChange(league.id)}
-              color={selectedLeague === league.id ? 'primary' : 'default'}
-              variant={selectedLeague === league.id ? 'filled' : 'outlined'}
+              onClick={() => onLeagueChange(league.code)}
+              color={selectedLeague === league.code ? 'primary' : 'default'}
+              variant={selectedLeague === league.code ? 'filled' : 'outlined'}
               sx={{ cursor: 'pointer' }}
             />
           ))}
