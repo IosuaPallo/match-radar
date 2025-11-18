@@ -167,7 +167,7 @@ export const Footer: React.FC = () => {
               >
                 <Typography variant="body2" sx={{ opacity: 0.6 }}>
                   © {currentYear} EuroMatchHub. All rights reserved. Data powered by
-                  RapidAPI Football API.
+                  football-data.org.
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <MuiLink
