@@ -9,12 +9,12 @@ const apiClient: AxiosInstance = axios.create({
 
 // Request queue to respect 10 requests per minute rate limit
 class RequestQueue {
-  private queue: Array<() => Promise<any>> = [];
+  private queue: Array<{ fn: () => Promise<any>; resolve: (value: any) => void; reject: (reason?: any) => void }> = [];
   private activeRequests = 0;
   private readonly maxConcurrent = 1; // Only 1 concurrent request to stay within rate limit
   private readonly requestDelay = 6000; // 6 second delay between requests (10 requests per minute = 1 request every 6 seconds)
 
-  async add<T>(fn: (signal?: AbortSignal) => Promise<T>, signal?: AbortSignal): Promise<T> {
+  async add<T>(fn: () => Promise<T>, signal?: AbortSignal): Promise<T> {
     return new Promise((resolve, reject) => {
       if (signal?.aborted) {
         reject(new Error('Request was cancelled'));
@@ -27,34 +27,41 @@ class RequestQueue {
 
       signal?.addEventListener('abort', abortHandler);
 
-      this.queue.push(async () => {
-        try {
-          if (signal?.aborted) {
-            throw new Error('Request was cancelled');
+      this.queue.push({
+        fn: async () => {
+          try {
+            if (signal?.aborted) {
+              throw new Error('Request was cancelled');
+            }
+            await this.delayRequest();
+            const result = await fn();
+            return result;
+          } finally {
+            signal?.removeEventListener('abort', abortHandler);
+            this.activeRequests--;
+            this.processQueue();
           }
-          await this.delayRequest();
-          const result = await fn(signal);
-          resolve(result);
-        } catch (error) {
-          reject(error);
-        } finally {
-          signal?.removeEventListener('abort', abortHandler);
-          this.activeRequests--;
-          this.processQueue();
-        }
+        },
+        resolve,
+        reject,
       });
       this.processQueue();
     });
   }
 
-  private processQueue(): void {
+  private async processQueue(): Promise<void> {
     if (this.queue.length === 0 || this.activeRequests >= this.maxConcurrent) {
       return;
     }
     this.activeRequests++;
-    const fn = this.queue.shift();
-    if (fn) {
-      fn();
+    const item = this.queue.shift();
+    if (item) {
+      try {
+        const result = await item.fn();
+        item.resolve(result);
+      } catch (error) {
+        item.reject(error);
+      }
     }
   }
 
