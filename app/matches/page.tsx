@@ -163,6 +163,8 @@ export default function MatchesPage() {
           </Box>
         </Box>
       </Container>
+
+      <Footer />
     </Box>
   );
 }
