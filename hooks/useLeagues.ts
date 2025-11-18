@@ -9,6 +9,8 @@ export const useLeagues = (season: number = 2024) => {
       const response = await footballApi.getLeagues({ season });
       return response.data as ApiResponse<League>;
     },
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };
 
@@ -21,6 +23,8 @@ export const useTopScorers = (leagueId: number | null, season: number = 2024) =>
       return response.data as ApiResponse<any>;
     },
     enabled: !!leagueId,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };
 
@@ -33,6 +37,8 @@ export const useTopAssists = (leagueId: number | null, season: number = 2024) =>
       return response.data as ApiResponse<any>;
     },
     enabled: !!leagueId,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };
 
@@ -45,5 +51,7 @@ export const useStandings = (leagueId: number | null, season: number = 2024) => 
       return response.data;
     },
     enabled: !!leagueId,
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
   });
 };
