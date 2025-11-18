@@ -9,7 +9,7 @@ import {
   Link as MuiLink,
   useTheme,
 } from '@mui/material';
-import Grid2 from '@mui/material/Grid2';
+import { Grid as Grid2 } from '@mui/material';
 import { motion } from 'framer-motion';
 
 const footerVariants = {
