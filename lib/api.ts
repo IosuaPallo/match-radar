@@ -12,30 +12,53 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Add retry logic with exponential backoff
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second base delay
+// Simple request queue to limit concurrent requests
+class RequestQueue {
+  private queue: Array<() => Promise<any>> = [];
+  private activeRequests = 0;
+  private readonly maxConcurrent = 2; // Only 2 concurrent requests
+  private readonly requestDelay = 1000; // 1 second delay between requests
 
+  async add<T>(fn: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.queue.push(async () => {
+        try {
+          await this.delayRequest();
+          const result = await fn();
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        } finally {
+          this.activeRequests--;
+          this.processQueue();
+        }
+      });
+      this.processQueue();
+    });
+  }
+
+  private processQueue(): void {
+    if (this.queue.length === 0 || this.activeRequests >= this.maxConcurrent) {
+      return;
+    }
+    this.activeRequests++;
+    const fn = this.queue.shift();
+    if (fn) {
+      fn();
+    }
+  }
+
+  private delayRequest(): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, this.requestDelay));
+  }
+}
+
+const requestQueue = new RequestQueue();
+
+// No retry logic in interceptor - let react-query handle retries
 apiClient.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
-    const config = error.config;
-    if (!config) throw error;
-
-    // Get retry count from config
-    const retryCount = (config as any).retryCount || 0;
-
-    // Retry on 429 (Too Many Requests) and 500 (Internal Server Error)
-    if ((error.response?.status === 429 || error.response?.status === 500) && retryCount < MAX_RETRIES) {
-      (config as any).retryCount = retryCount + 1;
-
-      // Exponential backoff: 1s, 2s, 4s
-      const delay = RETRY_DELAY * Math.pow(2, retryCount);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-
-      return apiClient(config);
-    }
-
+  (error: AxiosError) => {
     throw error;
   }
 );
