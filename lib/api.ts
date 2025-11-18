@@ -1,32 +1,21 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api-football-v1.p.rapidapi.com/v3';
-const RAPIDAPI_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '';
-
-// Extract hostname from RAPIDAPI_HOST env var (handle both full URL and hostname)
-let rapidApiHost = process.env.NEXT_PUBLIC_RAPIDAPI_HOST || 'api-football-v1.p.rapidapi.com';
-if (rapidApiHost.includes('http')) {
-  try {
-    rapidApiHost = new URL(rapidApiHost).hostname || 'api-football-v1.p.rapidapi.com';
-  } catch {
-    rapidApiHost = 'api-football-v1.p.rapidapi.com';
-  }
-}
+const API_BASE_URL = process.env.FOOTBALL_DATA_API_BASE_URL || 'https://api.football-data.org/v4';
+const API_KEY = process.env.FOOTBALL_DATA_API_KEY || '';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'x-rapidapi-key': RAPIDAPI_KEY,
-    'x-rapidapi-host': rapidApiHost,
+    'X-Auth-Token': API_KEY,
   },
 });
 
-// Simple request queue to limit concurrent requests
+// Request queue to respect 10 requests per minute rate limit
 class RequestQueue {
   private queue: Array<() => Promise<any>> = [];
   private activeRequests = 0;
-  private readonly maxConcurrent = 2; // Only 2 concurrent requests
-  private readonly requestDelay = 1000; // 1 second delay between requests
+  private readonly maxConcurrent = 1; // Only 1 concurrent request to stay within rate limit
+  private readonly requestDelay = 6000; // 6 second delay between requests (10 requests per minute = 1 request every 6 seconds)
 
   async add<T>(fn: () => Promise<T>): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -64,7 +53,6 @@ class RequestQueue {
 
 const requestQueue = new RequestQueue();
 
-// No retry logic in interceptor - let react-query handle retries
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
@@ -75,65 +63,38 @@ apiClient.interceptors.response.use(
 export const footballApi = {
   // Matches
   getMatches: (params: Record<string, any>) =>
-    requestQueue.add(() => apiClient.get('/fixtures', { params })),
+    requestQueue.add(() => apiClient.get('/matches', { params })),
+
+  getMatchesByCompetition: (competitionCode: string, params: Record<string, any> = {}) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/matches`, { params })),
 
   getMatchDetails: (matchId: number) =>
-    requestQueue.add(() => apiClient.get(`/fixtures`, { params: { id: matchId } })),
-
-  getMatchLineups: (matchId: number) =>
-    requestQueue.add(() => apiClient.get(`/fixtures/lineups`, { params: { fixture: matchId } })),
-
-  getMatchStatistics: (matchId: number) =>
-    requestQueue.add(() => apiClient.get(`/fixtures/statistics`, { params: { fixture: matchId } })),
-
-  getMatchEvents: (matchId: number) =>
-    requestQueue.add(() => apiClient.get(`/fixtures/events`, { params: { fixture: matchId } })),
+    requestQueue.add(() => apiClient.get(`/matches/${matchId}`)),
 
   // Teams
-  getTeams: (params: Record<string, any>) =>
-    requestQueue.add(() => apiClient.get('/teams', { params })),
+  getTeamsByCompetition: (competitionCode: string) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/teams`)),
 
   getTeamById: (teamId: number) =>
-    requestQueue.add(() => apiClient.get('/teams', { params: { id: teamId } })),
-
-  getTeamPlayers: (teamId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/players', { params: { team: teamId, season } })),
-
-  getTeamStatistics: (leagueId: number, teamId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/teams/statistics', {
-      params: { league: leagueId, team: teamId, season }
-    })),
-
-  // Players
-  getPlayers: (params: Record<string, any>) =>
-    requestQueue.add(() => apiClient.get('/players', { params })),
-
-  getPlayerById: (playerId: number) =>
-    requestQueue.add(() => apiClient.get('/players', { params: { id: playerId } })),
-
-  getPlayerStatistics: (playerId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/players', { params: { id: playerId, season } })),
-
-  // Leagues
-  getLeagues: (params: Record<string, any> = {}) =>
-    requestQueue.add(() => apiClient.get('/leagues', { params })),
-
-  getLeagueStandings: (leagueId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/standings', { params: { league: leagueId, season } })),
-
-  getLeagueTopScorers: (leagueId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/players/topscorers', {
-      params: { league: leagueId, season }
-    })),
-
-  getLeagueTopAssists: (leagueId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/players/topassists', {
-      params: { league: leagueId, season }
-    })),
+    requestQueue.add(() => apiClient.get(`/teams/${teamId}`)),
 
   // Standings
-  getStandings: (leagueId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/standings', { params: { league: leagueId, season } })),
+  getStandingsByCompetition: (competitionCode: string) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/standings`)),
+
+  // Scorers/Players
+  getScorersByCompetition: (competitionCode: string) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/scorers`)),
+
+  getPersonById: (personId: number) =>
+    requestQueue.add(() => apiClient.get(`/persons/${personId}`)),
+
+  // Competitions
+  getCompetitions: () =>
+    requestQueue.add(() => apiClient.get('/competitions')),
+
+  getCompetitionById: (competitionCode: string) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}`)),
 };
 
 export default apiClient;
