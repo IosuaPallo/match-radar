@@ -420,6 +420,8 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
           )}
         </Box>
       </Container>
+
+      <Footer />
     </Box>
   );
 }
