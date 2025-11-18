@@ -20,24 +20,24 @@ import { Footer } from '@/components/Footer';
 import { Search } from '@mui/icons-material';
 
 const majorEuropeanLeagues = [
-  { id: 39, name: 'Premier League' },
-  { id: 140, name: 'La Liga' },
-  { id: 61, name: 'Ligue 1' },
-  { id: 78, name: 'Bundesliga' },
-  { id: 135, name: 'Serie A' },
-  { id: 2, name: 'Champions League' },
-  { id: 3, name: 'Europa League' },
+  { code: 'PL', name: 'Premier League' },
+  { code: 'PD', name: 'La Liga' },
+  { code: 'FL1', name: 'Ligue 1' },
+  { code: 'BL1', name: 'Bundesliga' },
+  { code: 'SA', name: 'Serie A' },
+  { code: 'CL', name: 'Champions League' },
+  { code: 'EL', name: 'Europa League' },
 ];
 
 export default function TeamsPage() {
-  const [selectedLeague, setSelectedLeague] = useState<number>(39);
+  const [selectedLeague, setSelectedLeague] = useState<string>('PL');
   const [searchQuery, setSearchQuery] = useState('');
 
   const standings = useStandings(selectedLeague);
 
   const filteredTeams = React.useMemo(() => {
-    if (!standings.data?.response?.[0]?.league?.standings) return [];
-    const allTeams = standings.data.response[0].league.standings.flat();
+    if (!standings.data?.standings) return [];
+    const allTeams = standings.data.standings.flatMap((table: any) => table.table || []);
     return allTeams.filter((entry: any) =>
       entry.team?.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -80,19 +80,19 @@ export default function TeamsPage() {
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   {majorEuropeanLeagues.map((league) => (
                     <Box
-                      key={league.id}
-                      onClick={() => setSelectedLeague(league.id)}
+                      key={league.code}
+                      onClick={() => setSelectedLeague(league.code)}
                       sx={{
                         px: 2,
                         py: 1,
                         borderRadius: 2,
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
-                        background: selectedLeague === league.id ? 'primary.main' : 'action.hover',
-                        color: selectedLeague === league.id ? 'primary.contrastText' : 'text.primary',
-                        fontWeight: selectedLeague === league.id ? 600 : 500,
+                        background: selectedLeague === league.code ? 'primary.main' : 'action.hover',
+                        color: selectedLeague === league.code ? 'primary.contrastText' : 'text.primary',
+                        fontWeight: selectedLeague === league.code ? 600 : 500,
                         '&:hover': {
-                          background: selectedLeague === league.id ? 'primary.dark' : 'action.selected',
+                          background: selectedLeague === league.code ? 'primary.dark' : 'action.selected',
                         },
                       }}
                     >
@@ -140,9 +140,7 @@ export default function TeamsPage() {
                               style={{
                                 padding: '12px 16px',
                                 textAlign: 'left',
-                                borderBottom: `1px solid ${
-                                  false ? '#30363d' : '#d0d7de'
-                                }`,
+                                borderBottom: `1px solid #d0d7de`,
                                 fontWeight: 600,
                               }}
                             >
@@ -152,9 +150,7 @@ export default function TeamsPage() {
                               style={{
                                 padding: '12px 16px',
                                 textAlign: 'left',
-                                borderBottom: `1px solid ${
-                                  false ? '#30363d' : '#d0d7de'
-                                }`,
+                                borderBottom: `1px solid #d0d7de`,
                                 fontWeight: 600,
                               }}
                             >
@@ -164,9 +160,7 @@ export default function TeamsPage() {
                               style={{
                                 padding: '12px 16px',
                                 textAlign: 'center',
-                                borderBottom: `1px solid ${
-                                  false ? '#30363d' : '#d0d7de'
-                                }`,
+                                borderBottom: `1px solid #d0d7de`,
                                 fontWeight: 600,
                               }}
                             >
@@ -176,9 +170,7 @@ export default function TeamsPage() {
                               style={{
                                 padding: '12px 16px',
                                 textAlign: 'center',
-                                borderBottom: `1px solid ${
-                                  false ? '#30363d' : '#d0d7de'
-                                }`,
+                                borderBottom: `1px solid #d0d7de`,
                                 fontWeight: 600,
                               }}
                             >
@@ -188,9 +180,7 @@ export default function TeamsPage() {
                               style={{
                                 padding: '12px 16px',
                                 textAlign: 'center',
-                                borderBottom: `1px solid ${
-                                  false ? '#30363d' : '#d0d7de'
-                                }`,
+                                borderBottom: `1px solid #d0d7de`,
                                 fontWeight: 600,
                               }}
                             >
@@ -200,9 +190,7 @@ export default function TeamsPage() {
                               style={{
                                 padding: '12px 16px',
                                 textAlign: 'center',
-                                borderBottom: `1px solid ${
-                                  false ? '#30363d' : '#d0d7de'
-                                }`,
+                                borderBottom: `1px solid #d0d7de`,
                                 fontWeight: 600,
                               }}
                             >
@@ -216,21 +204,17 @@ export default function TeamsPage() {
                               <td
                                 style={{
                                   padding: '12px 16px',
-                                  borderBottom: `1px solid ${
-                                    false ? '#30363d' : '#d0d7de'
-                                  }`,
+                                  borderBottom: `1px solid #d0d7de`,
                                   fontWeight: 600,
                                   color: '#00a8ff',
                                 }}
                               >
-                                {entry.rank}
+                                {entry.position}
                               </td>
                               <td
                                 style={{
                                   padding: '12px 16px',
-                                  borderBottom: `1px solid ${
-                                    false ? '#30363d' : '#d0d7de'
-                                  }`,
+                                  borderBottom: `1px solid #d0d7de`,
                                   fontWeight: 500,
                                 }}
                               >
@@ -239,42 +223,34 @@ export default function TeamsPage() {
                               <td
                                 style={{
                                   padding: '12px 16px',
-                                  borderBottom: `1px solid ${
-                                    false ? '#30363d' : '#d0d7de'
-                                  }`,
+                                  borderBottom: `1px solid #d0d7de`,
                                   textAlign: 'center',
                                 }}
                               >
-                                {entry.all?.played || 0}
+                                {entry.playedGames || 0}
                               </td>
                               <td
                                 style={{
                                   padding: '12px 16px',
-                                  borderBottom: `1px solid ${
-                                    false ? '#30363d' : '#d0d7de'
-                                  }`,
+                                  borderBottom: `1px solid #d0d7de`,
                                   textAlign: 'center',
                                 }}
                               >
-                                {entry.all?.win}-{entry.all?.draw}-{entry.all?.lose}
+                                {entry.won}-{entry.draw}-{entry.lost}
                               </td>
                               <td
                                 style={{
                                   padding: '12px 16px',
-                                  borderBottom: `1px solid ${
-                                    false ? '#30363d' : '#d0d7de'
-                                  }`,
+                                  borderBottom: `1px solid #d0d7de`,
                                   textAlign: 'center',
                                 }}
                               >
-                                {entry.all?.goals?.for}-{entry.all?.goals?.against}
+                                {entry.goalsFor}-{entry.goalsAgainst}
                               </td>
                               <td
                                 style={{
                                   padding: '12px 16px',
-                                  borderBottom: `1px solid ${
-                                    false ? '#30363d' : '#d0d7de'
-                                  }`,
+                                  borderBottom: `1px solid #d0d7de`,
                                   textAlign: 'center',
                                   fontWeight: 600,
                                   color: '#1de9b6',
