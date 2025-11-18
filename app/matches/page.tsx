@@ -144,7 +144,7 @@ export default function MatchesPage() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <Grid container spacing={2}>
+                <Grid2 container spacing={2}>
                   {data.matches.map((match) => (
                     <Grid item xs={12} sm={6} md={4} key={match.id}>
                       <MatchCard match={match} />
