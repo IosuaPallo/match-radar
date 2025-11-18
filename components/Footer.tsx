@@ -52,7 +52,7 @@ export const Footer: React.FC = () => {
         <Container maxWidth="lg">
           <Grid2 container spacing={4} sx={{ mb: 4 }}>
             {/* About */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
               <motion.div variants={itemVariants}>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                   ⚽ EuroMatchHub
@@ -65,7 +65,7 @@ export const Footer: React.FC = () => {
             </Grid>
 
             {/* Quick Links */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
               <motion.div variants={itemVariants}>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                   Quick Links
@@ -98,7 +98,7 @@ export const Footer: React.FC = () => {
             </Grid>
 
             {/* Leagues */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
               <motion.div variants={itemVariants}>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                   Major Leagues
@@ -131,7 +131,7 @@ export const Footer: React.FC = () => {
             </Grid>
 
             {/* Stats */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
               <motion.div variants={itemVariants}>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                   Coverage
