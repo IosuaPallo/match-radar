@@ -22,19 +22,19 @@ import { getDateRange } from '@/utils/date';
 import { Footer } from '@/components/Footer';
 
 const majorEuropeanLeagues = [
-  { id: 39, name: 'Premier League' },
-  { id: 140, name: 'La Liga' },
-  { id: 61, name: 'Ligue 1' },
-  { id: 78, name: 'Bundesliga' },
-  { id: 135, name: 'Serie A' },
-  { id: 2, name: 'Champions League' },
-  { id: 3, name: 'Europa League' },
+  { code: 'PL', name: 'Premier League' },
+  { code: 'PD', name: 'La Liga' },
+  { code: 'FL1', name: 'Ligue 1' },
+  { code: 'BL1', name: 'Bundesliga' },
+  { code: 'SA', name: 'Serie A' },
+  { code: 'CL', name: 'Champions League' },
+  { code: 'EL', name: 'Europa League' },
 ];
 
 export default function MatchesPage() {
   const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
-  const [selectedLeague, setSelectedLeague] = useState<number>(39);
+  const [selectedLeague, setSelectedLeague] = useState<string>('PL');
 
   const recentDateRange = getDateRange(-7);
   const upcomingDateRange = getDateRange(7);
@@ -42,21 +42,21 @@ export default function MatchesPage() {
   const recentMatches = useMatches({
     from: recentDateRange.from,
     to: recentDateRange.to,
-    leagueId: selectedLeague,
-    status: 'finished',
+    competitionCode: selectedLeague,
+    status: 'FINISHED',
   });
 
   const upcomingMatches = useMatches({
     from: upcomingDateRange.from,
     to: upcomingDateRange.to,
-    leagueId: selectedLeague,
-    status: 'scheduled',
+    competitionCode: selectedLeague,
+    status: 'TIMED',
   });
 
   const isLoading = tabValue === 0 ? recentMatches.isLoading : upcomingMatches.isLoading;
   const data = tabValue === 0 ? recentMatches.data : upcomingMatches.data;
 
-  const selectedLeagueName = majorEuropeanLeagues.find((l) => l.id === selectedLeague)?.name || 'All Leagues';
+  const selectedLeagueName = majorEuropeanLeagues.find((l) => l.code === selectedLeague)?.name || 'All Leagues';
 
   return (
     <Box sx={{ minHeight: '100vh', pb: 8 }}>
@@ -93,19 +93,19 @@ export default function MatchesPage() {
               <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                 {majorEuropeanLeagues.map((league) => (
                   <Box
-                    key={league.id}
-                    onClick={() => setSelectedLeague(league.id)}
+                    key={league.code}
+                    onClick={() => setSelectedLeague(league.code)}
                     sx={{
                       px: 2,
                       py: 1,
                       borderRadius: 2,
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
-                      background: selectedLeague === league.id ? 'primary.main' : 'action.hover',
-                      color: selectedLeague === league.id ? 'primary.contrastText' : 'text.primary',
-                      fontWeight: selectedLeague === league.id ? 600 : 500,
+                      background: selectedLeague === league.code ? 'primary.main' : 'action.hover',
+                      color: selectedLeague === league.code ? 'primary.contrastText' : 'text.primary',
+                      fontWeight: selectedLeague === league.code ? 600 : 500,
                       '&:hover': {
-                        background: selectedLeague === league.id ? 'primary.dark' : 'action.selected',
+                        background: selectedLeague === league.code ? 'primary.dark' : 'action.selected',
                       },
                     }}
                   >
@@ -137,14 +137,14 @@ export default function MatchesPage() {
           <Box>
             {isLoading ? (
               <MatchCardSkeleton count={6} />
-            ) : data?.response?.length ? (
+            ) : data?.matches?.length ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
                 <Grid container spacing={2}>
-                  {data.response.map((match) => (
+                  {data.matches.map((match) => (
                     <Grid item xs={12} sm={6} md={4} key={match.id}>
                       <MatchCard match={match} />
                     </Grid>
