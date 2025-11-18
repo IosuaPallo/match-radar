@@ -24,7 +24,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
-import { useMatchDetails, useMatchLineups, useMatchStatistics } from '@/hooks/useMatches';
+import { useMatchDetails } from '@/hooks/useMatches';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton';
 import { Footer } from '@/components/Footer';
 import { ArrowBack } from '@mui/icons-material';
@@ -43,14 +43,12 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
 
   const matchId = resolvedParams ? parseInt(resolvedParams.id) : null;
   const matchDetails = useMatchDetails(matchId);
-  const matchLineups = useMatchLineups(matchId);
-  const matchStats = useMatchStatistics(matchId);
 
   if (!matchId) {
     return <LoadingSkeleton />;
   }
 
-  const match = matchDetails.data?.response?.[0];
+  const match = matchDetails.data;
   const theme = useTheme();
 
   if (matchDetails.isLoading) {
@@ -91,8 +89,17 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
     );
   }
 
-  const isFinished = match.status.short === 'FT' || match.status.short === 'AET' || match.status.short === 'PEN';
-  const isLive = match.status.short === 'LIVE' || match.status.short === '1H' || match.status.short === '2H';
+  const isFinished = match.status === 'FINISHED';
+  const isLive = match.status === 'LIVE' || match.status === 'IN_PLAY';
+  const homeGoals = match.score.fullTime.home;
+  const awayGoals = match.score.fullTime.away;
+  const statusLabel = match.status === 'TIMED' ? 'Not Started' :
+                      match.status === 'LIVE' || match.status === 'IN_PLAY' ? 'Live' :
+                      match.status === 'FINISHED' ? 'Finished' :
+                      match.status === 'POSTPONED' ? 'Postponed' :
+                      match.status === 'CANCELLED' ? 'Cancelled' :
+                      match.status === 'SUSPENDED' ? 'Suspended' :
+                      match.status;
 
   return (
     <Box sx={{ minHeight: '100vh', pb: 8 }}>
@@ -128,7 +135,7 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                 {/* League Info */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    {match.league?.name}
+                    {match.competition?.name}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -140,7 +147,7 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                       color: isLive ? '#ff4040' : '#4caf50',
                     }}
                   >
-                    {match.status.long}
+                    {statusLabel}
                   </Typography>
                 </Box>
 
@@ -149,9 +156,9 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                   {/* Home Team */}
                   <Grid item xs={12} sm={5}>
                     <Box sx={{ textAlign: 'center' }}>
-                      {match.homeTeam.logo && (
+                      {match.homeTeam.crest && (
                         <Image
-                          src={match.homeTeam.logo}
+                          src={match.homeTeam.crest}
                           alt={match.homeTeam.name}
                           width={80}
                           height={80}
@@ -168,13 +175,13 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                   <Grid item xs={12} sm={2}>
                     <Box sx={{ textAlign: 'center', py: 2 }}>
                       <Typography variant="h3" sx={{ fontWeight: 800, color: 'primary.main' }}>
-                        {match.goals.home !== null ? match.goals.home : '-'}
+                        {homeGoals !== null ? homeGoals : '-'}
                       </Typography>
                       <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mt: 1 }}>
                         vs
                       </Typography>
                       <Typography variant="h3" sx={{ fontWeight: 800, color: 'secondary.main' }}>
-                        {match.goals.away !== null ? match.goals.away : '-'}
+                        {awayGoals !== null ? awayGoals : '-'}
                       </Typography>
                     </Box>
                   </Grid>
@@ -182,9 +189,9 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                   {/* Away Team */}
                   <Grid item xs={12} sm={5}>
                     <Box sx={{ textAlign: 'center' }}>
-                      {match.awayTeam.logo && (
+                      {match.awayTeam.crest && (
                         <Image
-                          src={match.awayTeam.logo}
+                          src={match.awayTeam.crest}
                           alt={match.awayTeam.name}
                           width={80}
                           height={80}
@@ -205,16 +212,16 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                       Date & Time
                     </Typography>
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {new Date(match.date).toLocaleString()}
+                      {new Date(match.utcDate).toLocaleString()}
                     </Typography>
                   </Box>
-                  {match.venue?.name && (
+                  {match.referees && match.referees.length > 0 && (
                     <Box>
                       <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                        Venue
+                        Referee
                       </Typography>
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {match.venue.name}
+                        {match.referees[0]?.name || 'N/A'}
                       </Typography>
                     </Box>
                   )}
@@ -235,9 +242,9 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                 },
               }}
             >
-              <Tab label="Statistics" />
-              <Tab label="Lineups" />
-              <Tab label="Commentary" />
+              <Tab label="Match Events" />
+              <Tab label="Goals & Cards" />
+              <Tab label="Referees" />
             </Tabs>
           </Box>
 
@@ -248,89 +255,56 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              {matchStats.isLoading ? (
-                <LoadingSkeleton />
-              ) : matchStats.data?.response?.length > 0 ? (
-                <Grid container spacing={3}>
-                  {matchStats.data.response.map((stat: any, idx: number) => (
-                    <Grid item xs={12} md={6} key={idx}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            {stat.team?.name}
-                          </Typography>
-
-                          <Box sx={{ mb: 2 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                              <Typography variant="body2">Possession</Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {stat.possession}%
-                              </Typography>
-                            </Box>
-                            <LinearProgress variant="determinate" value={stat.possession || 0} />
+              {match.goals && match.goals.length > 0 ? (
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                      Match Events
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {match.goals.map((goal: any, idx: number) => (
+                        <Box key={idx} sx={{ p: 2, background: 'action.hover', borderRadius: 1 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {goal.player?.name}
+                            </Typography>
+                            <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                              {goal.minute}'
+                            </Typography>
                           </Box>
-
-                          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                            <Box>
-                              <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                                Shots
+                          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                            {goal.team?.crest && (
+                              <Image
+                                src={goal.team.crest}
+                                alt={goal.team.name}
+                                width={24}
+                                height={24}
+                              />
+                            )}
+                            <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                              {goal.team?.name}
+                            </Typography>
+                            {goal.type && (
+                              <Typography variant="caption" sx={{ background: 'primary.main', color: 'primary.contrastText', px: 1, borderRadius: 0.5 }}>
+                                {goal.type === 'OWN_GOAL' ? 'Own Goal' : goal.type === 'PENALTY' ? 'Penalty' : 'Regular'}
                               </Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                                {stat.shots?.total || 0}
-                              </Typography>
-                              <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
-                                {stat.shots?.on || 0} on target
-                              </Typography>
-                            </Box>
-                            <Box>
-                              <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                                Passes
-                              </Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                                {stat.passes?.total || 0}
-                              </Typography>
-                              <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
-                                {stat.passes?.accurate || 0} accurate
-                              </Typography>
-                            </Box>
+                            )}
                           </Box>
-
-                          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1, mt: 2 }}>
-                            <Box>
-                              <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                                Corners
-                              </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {stat.corners || 0}
-                              </Typography>
-                            </Box>
-                            <Box>
-                              <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                                Fouls
-                              </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {stat.fouls || 0}
-                              </Typography>
-                            </Box>
-                            <Box>
-                              <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                                Offsides
-                              </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {stat.offsides || 0}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
+                          {goal.assist?.player && (
+                            <Typography variant="caption" sx={{ opacity: 0.6, display: 'block', mt: 1 }}>
+                              Assist: {goal.assist.player.name}
+                            </Typography>
+                          )}
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
               ) : (
                 <Card>
                   <CardContent sx={{ textAlign: 'center', py: 4 }}>
                     <Typography variant="body1" sx={{ opacity: 0.7 }}>
-                      Match statistics not available yet
+                      No events recorded yet
                     </Typography>
                   </CardContent>
                 </Card>
@@ -344,55 +318,56 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              {matchLineups.isLoading ? (
-                <LoadingSkeleton />
-              ) : matchLineups.data?.response?.length > 0 ? (
-                <Grid container spacing={3}>
-                  {matchLineups.data.response.map((lineup: any, idx: number) => (
-                    <Grid item xs={12} md={6} key={idx}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            {lineup.team?.name}
-                          </Typography>
-                          <Typography variant="body2" sx={{ opacity: 0.7, mb: 2 }}>
-                            Formation: {lineup.formation}
-                          </Typography>
-
-                          <TableContainer>
-                            <Table size="small">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell>Player</TableCell>
-                                  <TableCell>Position</TableCell>
-                                  <TableCell align="right">Rating</TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {lineup.players?.slice(0, 11).map((player: any, pidx: number) => (
-                                  <TableRow key={pidx}>
-                                    <TableCell sx={{ fontWeight: 500 }}>
-                                      {player.player?.name}
-                                    </TableCell>
-                                    <TableCell>{player.position}</TableCell>
-                                    <TableCell align="right">
-                                      {player.rating ? player.rating.toFixed(1) : '-'}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
+              {match.bookings && match.bookings.length > 0 ? (
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                      Yellow & Red Cards
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {match.bookings.map((booking: any, idx: number) => (
+                        <Box key={idx} sx={{ p: 2, background: 'action.hover', borderRadius: 1 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, alignItems: 'center' }}>
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                              <Box
+                                sx={{
+                                  width: 16,
+                                  height: 24,
+                                  background: booking.card === 'YELLOW' ? '#FFD700' : '#FF0000',
+                                  borderRadius: 0.25,
+                                }}
+                              />
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {booking.player?.name}
+                              </Typography>
+                            </Box>
+                            <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                              {booking.minute}'
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                            {booking.team?.crest && (
+                              <Image
+                                src={booking.team.crest}
+                                alt={booking.team.name}
+                                width={24}
+                                height={24}
+                              />
+                            )}
+                            <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                              {booking.team?.name}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
               ) : (
                 <Card>
                   <CardContent sx={{ textAlign: 'center', py: 4 }}>
                     <Typography variant="body1" sx={{ opacity: 0.7 }}>
-                      Lineups not available yet
+                      No cards in this match
                     </Typography>
                   </CardContent>
                 </Card>
@@ -406,16 +381,40 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <Card>
-                <CardContent sx={{ textAlign: 'center', py: 6 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                    Live Commentary
-                  </Typography>
-                  <Typography variant="body1" sx={{ opacity: 0.7 }}>
-                    Commentary updates coming soon
-                  </Typography>
-                </CardContent>
-              </Card>
+              {match.referees && match.referees.length > 0 ? (
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                      Match Officials
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {match.referees.map((referee: any, idx: number) => (
+                        <Box key={idx} sx={{ p: 2, background: 'action.hover', borderRadius: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {referee.name}
+                          </Typography>
+                          <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                            {referee.type}
+                          </Typography>
+                          {referee.nationality && (
+                            <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
+                              {referee.nationality}
+                            </Typography>
+                          )}
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography variant="body1" sx={{ opacity: 0.7 }}>
+                      Referee information not available
+                    </Typography>
+                  </CardContent>
+                </Card>
+              )}
             </motion.div>
           )}
         </Box>
