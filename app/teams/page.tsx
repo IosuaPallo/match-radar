@@ -304,6 +304,8 @@ export default function TeamsPage() {
           </Box>
         </Box>
       </Container>
+
+      <Footer />
     </Box>
   );
 }
