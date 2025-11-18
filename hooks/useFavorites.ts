@@ -43,7 +43,7 @@ export const useFavorites = () => {
     if (isFavorite(item.type, item.id)) {
       removeFavorite(item.type, item.id);
     } else {
-      addFavorite(item as FavoriteItem);
+      addFavorite(item);
     }
   };
 
