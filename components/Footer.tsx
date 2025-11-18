@@ -5,10 +5,11 @@ import {
   Box,
   Container,
   Typography,
-  Grid,
+
   Link as MuiLink,
   useTheme,
 } from '@mui/material';
+import { Grid as Grid2 } from '@mui/material';
 import { motion } from 'framer-motion';
 
 const footerVariants = {
@@ -49,9 +50,9 @@ export const Footer: React.FC = () => {
         }}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={4} sx={{ mb: 4 }}>
+          <Grid2 container spacing={4} sx={{ mb: 4 }}>
             {/* About */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
               <motion.div variants={itemVariants}>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                   ⚽ EuroMatchHub
@@ -61,10 +62,10 @@ export const Footer: React.FC = () => {
                   matches, and player insights.
                 </Typography>
               </motion.div>
-            </Grid>
+            </Grid2>
 
             {/* Quick Links */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
               <motion.div variants={itemVariants}>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                   Quick Links
@@ -94,10 +95,10 @@ export const Footer: React.FC = () => {
                   ))}
                 </Box>
               </motion.div>
-            </Grid>
+            </Grid2>
 
             {/* Leagues */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
               <motion.div variants={itemVariants}>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                   Major Leagues
@@ -127,10 +128,10 @@ export const Footer: React.FC = () => {
                   ))}
                 </Box>
               </motion.div>
-            </Grid>
+            </Grid2>
 
             {/* Stats */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid2 size={{ xs: 12, sm: 6, md: 3 }}>
               <motion.div variants={itemVariants}>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
                   Coverage
@@ -150,8 +151,8 @@ export const Footer: React.FC = () => {
                   </Typography>
                 </Box>
               </motion.div>
-            </Grid>
-          </Grid>
+            </Grid2>
+          </Grid2>
 
           {/* Divider */}
           <Box sx={{ borderTop: 1, borderColor: 'divider', py: 3 }}>
@@ -167,7 +168,7 @@ export const Footer: React.FC = () => {
               >
                 <Typography variant="body2" sx={{ opacity: 0.6 }}>
                   © {currentYear} EuroMatchHub. All rights reserved. Data powered by
-                  RapidAPI Football API.
+                  football-data.org.
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <MuiLink

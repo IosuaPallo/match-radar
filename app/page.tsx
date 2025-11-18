@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import {
   Container,
-  Grid,
+
   Typography,
   Box,
   Button,
@@ -12,6 +12,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
+import { Grid as Grid2 } from '@mui/material';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
@@ -47,7 +48,7 @@ const itemVariants: Variants = {
 export default function Home() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [selectedLeague, setSelectedLeague] = useState<number>(39);
+  const [selectedLeague, setSelectedLeague] = useState<string>('PL');
 
   const recentDateRange = getDateRange(-7);
   const upcomingDateRange = getDateRange(7);
@@ -55,15 +56,15 @@ export default function Home() {
   const recentMatches = useMatches({
     from: recentDateRange.from,
     to: recentDateRange.to,
-    leagueId: selectedLeague,
-    status: 'finished',
+    competitionCode: selectedLeague,
+    status: 'FINISHED',
   });
 
   const upcomingMatches = useMatches({
     from: upcomingDateRange.from,
     to: upcomingDateRange.to,
-    leagueId: selectedLeague,
-    status: 'scheduled',
+    competitionCode: selectedLeague,
+    status: 'TIMED',
   });
 
   const topScorers = useTopScorers(selectedLeague);
@@ -163,14 +164,14 @@ export default function Home() {
 
                 {recentMatches.isLoading ? (
                   <MatchCardSkeleton count={3} />
-                ) : recentMatches.data?.response?.length ? (
-                  <Grid container spacing={2}>
-                    {recentMatches.data.response.slice(0, 3).map((match) => (
-                      <Grid xs={12} sm={6} md={4} key={match.id}>
+                ) : recentMatches.data?.matches?.length ? (
+                  <Grid2 container spacing={2}>
+                    {recentMatches.data.matches.slice(0, 3).map((match) => (
+                      <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                         <MatchCard match={match} />
-                      </Grid>
+                      </Grid2>
                     ))}
-                  </Grid>
+                  </Grid2>
                 ) : (
                   <Card>
                     <CardContent sx={{ textAlign: 'center', py: 4 }}>
@@ -216,14 +217,14 @@ export default function Home() {
 
                 {upcomingMatches.isLoading ? (
                   <MatchCardSkeleton count={3} />
-                ) : upcomingMatches.data?.response?.length ? (
-                  <Grid container spacing={2}>
-                    {upcomingMatches.data.response.slice(0, 3).map((match) => (
-                      <Grid item xs={12} sm={6} md={4} key={match.id}>
+                ) : upcomingMatches.data?.matches?.length ? (
+                  <Grid2 container spacing={2}>
+                    {upcomingMatches.data.matches.slice(0, 3).map((match) => (
+                      <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                         <MatchCard match={match} />
-                      </Grid>
+                      </Grid2>
                     ))}
-                  </Grid>
+                  </Grid2>
                 ) : (
                   <Card>
                     <CardContent sx={{ textAlign: 'center', py: 4 }}>
@@ -269,10 +270,10 @@ export default function Home() {
 
                 {topScorers.isLoading ? (
                   <LoadingSkeleton count={3} type="card" />
-                ) : topScorers.data?.response?.length ? (
-                  <Grid container spacing={2}>
-                    {topScorers.data.response.slice(0, 6).map((player: any, idx: number) => (
-                      <Grid item xs={12} sm={6} md={4} key={idx}>
+                ) : topScorers.data?.scorers?.length ? (
+                  <Grid2 container spacing={2}>
+                    {topScorers.data.scorers.slice(0, 6).map((scorer: any, idx: number) => (
+                      <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
                         <Card
                           sx={{
                             height: '100%',
@@ -303,10 +304,10 @@ export default function Home() {
                               </Box>
                               <Box flex={1}>
                                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                                  {player.player?.name || '-'}
+                                  {scorer.player?.name || '-'}
                                 </Typography>
                                 <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                                  {player.statistics?.[0]?.team?.name || '-'}
+                                  {scorer.team?.name || '-'}
                                 </Typography>
                               </Box>
                             </Box>
@@ -316,7 +317,7 @@ export default function Home() {
                                   Goals
                                 </Typography>
                                 <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                                  {player.statistics?.[0]?.goals || 0}
+                                  {scorer.goals || 0}
                                 </Typography>
                               </Box>
                               <Box>
@@ -324,15 +325,15 @@ export default function Home() {
                                   Assists
                                 </Typography>
                                 <Typography variant="h5" sx={{ fontWeight: 700, color: 'secondary.main' }}>
-                                  {player.statistics?.[0]?.assists || 0}
+                                  {scorer.assists || 0}
                                 </Typography>
                               </Box>
                             </Box>
                           </CardContent>
                         </Card>
-                      </Grid>
+                      </Grid2>
                     ))}
-                  </Grid>
+                  </Grid2>
                 ) : (
                   <Card>
                     <CardContent sx={{ textAlign: 'center', py: 4 }}>

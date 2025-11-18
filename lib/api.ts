@@ -1,59 +1,67 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api-football-v1.p.rapidapi.com/v3';
-const RAPIDAPI_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '';
-
-// Extract hostname from RAPIDAPI_HOST env var (handle both full URL and hostname)
-let rapidApiHost = process.env.NEXT_PUBLIC_RAPIDAPI_HOST || 'api-football-v1.p.rapidapi.com';
-if (rapidApiHost.includes('http')) {
-  try {
-    rapidApiHost = new URL(rapidApiHost).hostname || 'api-football-v1.p.rapidapi.com';
-  } catch {
-    rapidApiHost = 'api-football-v1.p.rapidapi.com';
-  }
-}
+// Use local proxy instead of external API (handles CORS and keeps API key server-side)
+const API_BASE_URL = '/api/football';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'x-rapidapi-key': RAPIDAPI_KEY,
-    'x-rapidapi-host': rapidApiHost,
-  },
 });
 
-// Simple request queue to limit concurrent requests
+// Request queue to respect 10 requests per minute rate limit
 class RequestQueue {
-  private queue: Array<() => Promise<any>> = [];
+  private queue: Array<{ fn: () => Promise<any>; resolve: (value: any) => void; reject: (reason?: any) => void }> = [];
   private activeRequests = 0;
-  private readonly maxConcurrent = 2; // Only 2 concurrent requests
-  private readonly requestDelay = 1000; // 1 second delay between requests
+  private readonly maxConcurrent = 1; // Only 1 concurrent request to stay within rate limit
+  private readonly requestDelay = 6000; // 6 second delay between requests (10 requests per minute = 1 request every 6 seconds)
 
-  async add<T>(fn: () => Promise<T>): Promise<T> {
+  async add<T>(fn: () => Promise<T>, signal?: AbortSignal): Promise<T> {
     return new Promise((resolve, reject) => {
-      this.queue.push(async () => {
-        try {
-          await this.delayRequest();
-          const result = await fn();
-          resolve(result);
-        } catch (error) {
-          reject(error);
-        } finally {
-          this.activeRequests--;
-          this.processQueue();
-        }
+      if (signal?.aborted) {
+        reject(new Error('Request was cancelled'));
+        return;
+      }
+
+      const abortHandler = () => {
+        reject(new Error('Request was cancelled'));
+      };
+
+      signal?.addEventListener('abort', abortHandler);
+
+      this.queue.push({
+        fn: async () => {
+          try {
+            if (signal?.aborted) {
+              throw new Error('Request was cancelled');
+            }
+            await this.delayRequest();
+            const result = await fn();
+            return result;
+          } finally {
+            signal?.removeEventListener('abort', abortHandler);
+            this.activeRequests--;
+            this.processQueue();
+          }
+        },
+        resolve,
+        reject,
       });
       this.processQueue();
     });
   }
 
-  private processQueue(): void {
+  private async processQueue(): Promise<void> {
     if (this.queue.length === 0 || this.activeRequests >= this.maxConcurrent) {
       return;
     }
     this.activeRequests++;
-    const fn = this.queue.shift();
-    if (fn) {
-      fn();
+    const item = this.queue.shift();
+    if (item) {
+      try {
+        const result = await item.fn();
+        item.resolve(result);
+      } catch (error) {
+        item.reject(error);
+      }
     }
   }
 
@@ -64,76 +72,51 @@ class RequestQueue {
 
 const requestQueue = new RequestQueue();
 
-// No retry logic in interceptor - let react-query handle retries
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
+    if (error.code !== 'ECONNABORTED') {
+      throw error;
+    }
     throw error;
   }
 );
 
 export const footballApi = {
   // Matches
-  getMatches: (params: Record<string, any>) =>
-    requestQueue.add(() => apiClient.get('/fixtures', { params })),
+  getMatches: (params: Record<string, any>, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get('/matches', { params, signal }), signal),
 
-  getMatchDetails: (matchId: number) =>
-    requestQueue.add(() => apiClient.get(`/fixtures`, { params: { id: matchId } })),
+  getMatchesByCompetition: (competitionCode: string, params: Record<string, any> = {}, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/matches`, { params, signal }), signal),
 
-  getMatchLineups: (matchId: number) =>
-    requestQueue.add(() => apiClient.get(`/fixtures/lineups`, { params: { fixture: matchId } })),
-
-  getMatchStatistics: (matchId: number) =>
-    requestQueue.add(() => apiClient.get(`/fixtures/statistics`, { params: { fixture: matchId } })),
-
-  getMatchEvents: (matchId: number) =>
-    requestQueue.add(() => apiClient.get(`/fixtures/events`, { params: { fixture: matchId } })),
+  getMatchDetails: (matchId: number, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/matches/${matchId}`, { signal }), signal),
 
   // Teams
-  getTeams: (params: Record<string, any>) =>
-    requestQueue.add(() => apiClient.get('/teams', { params })),
+  getTeamsByCompetition: (competitionCode: string, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/teams`, { signal }), signal),
 
-  getTeamById: (teamId: number) =>
-    requestQueue.add(() => apiClient.get('/teams', { params: { id: teamId } })),
-
-  getTeamPlayers: (teamId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/players', { params: { team: teamId, season } })),
-
-  getTeamStatistics: (leagueId: number, teamId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/teams/statistics', {
-      params: { league: leagueId, team: teamId, season }
-    })),
-
-  // Players
-  getPlayers: (params: Record<string, any>) =>
-    requestQueue.add(() => apiClient.get('/players', { params })),
-
-  getPlayerById: (playerId: number) =>
-    requestQueue.add(() => apiClient.get('/players', { params: { id: playerId } })),
-
-  getPlayerStatistics: (playerId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/players', { params: { id: playerId, season } })),
-
-  // Leagues
-  getLeagues: (params: Record<string, any> = {}) =>
-    requestQueue.add(() => apiClient.get('/leagues', { params })),
-
-  getLeagueStandings: (leagueId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/standings', { params: { league: leagueId, season } })),
-
-  getLeagueTopScorers: (leagueId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/players/topscorers', {
-      params: { league: leagueId, season }
-    })),
-
-  getLeagueTopAssists: (leagueId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/players/topassists', {
-      params: { league: leagueId, season }
-    })),
+  getTeamById: (teamId: number, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/teams/${teamId}`, { signal }), signal),
 
   // Standings
-  getStandings: (leagueId: number, season: number) =>
-    requestQueue.add(() => apiClient.get('/standings', { params: { league: leagueId, season } })),
+  getStandingsByCompetition: (competitionCode: string, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/standings`, { signal }), signal),
+
+  // Scorers/Players
+  getScorersByCompetition: (competitionCode: string, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}/scorers`, { signal }), signal),
+
+  getPersonById: (personId: number, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/persons/${personId}`, { signal }), signal),
+
+  // Competitions
+  getCompetitions: (signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get('/competitions', { signal }), signal),
+
+  getCompetitionById: (competitionCode: string, signal?: AbortSignal) =>
+    requestQueue.add(() => apiClient.get(`/competitions/${competitionCode}`, { signal }), signal),
 };
 
 export default apiClient;
