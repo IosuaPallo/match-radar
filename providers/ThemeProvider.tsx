@@ -15,7 +15,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const useThemeMode = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useThemeMode must be used within ThemeProvider');
+    return { mode: 'dark' as PaletteMode, toggleTheme: () => {} };
   }
   return context;
 };
