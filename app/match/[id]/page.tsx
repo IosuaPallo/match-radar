@@ -36,6 +36,7 @@ interface MatchDetailsPageProps {
 export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
   const [resolvedParams, setResolvedParams] = React.useState<{ id: string } | null>(null);
   const [tabValue, setTabValue] = useState(0);
+  const theme = useTheme();
 
   React.useEffect(() => {
     params.then(setResolvedParams);
@@ -49,7 +50,6 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
   }
 
   const match = matchDetails.data;
-  const theme = useTheme();
 
   if (matchDetails.isLoading) {
     return (
