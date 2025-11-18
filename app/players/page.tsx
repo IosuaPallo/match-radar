@@ -222,6 +222,8 @@ export default function PlayersPage() {
           </Box>
         </Box>
       </Container>
+
+      <Footer />
     </Box>
   );
 }
