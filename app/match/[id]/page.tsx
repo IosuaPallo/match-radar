@@ -26,6 +26,7 @@ import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { useMatchDetails, useMatchLineups, useMatchStatistics } from '@/hooks/useMatches';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton';
+import { Footer } from '@/components/Footer';
 import { ArrowBack } from '@mui/icons-material';
 
 interface MatchDetailsPageProps {
