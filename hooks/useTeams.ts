@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { footballApi } from '@/lib/api';
-import { TeamStats, ApiResponse } from '@/lib/types';
+import { TeamDetail, TeamsResponse } from '@/lib/types';
 
 export const useTeamById = (teamId: number | null) => {
   return useQuery({
@@ -8,42 +8,28 @@ export const useTeamById = (teamId: number | null) => {
     queryFn: async () => {
       if (!teamId) return null;
       const response = await footballApi.getTeamById(teamId);
-      return response.data as ApiResponse<any>;
+      return response.data as TeamDetail;
     },
     enabled: !!teamId,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
+    staleTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours
+    retry: 1,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 30000),
   });
 };
 
-export const useTeamPlayers = (teamId: number | null, season: number = 2024) => {
+export const useTeamsByCompetition = (competitionCode: string | null) => {
   return useQuery({
-    queryKey: ['team-players', teamId, season],
+    queryKey: ['teams', competitionCode],
     queryFn: async () => {
-      if (!teamId) return null;
-      const response = await footballApi.getTeamPlayers(teamId, season);
-      return response.data as ApiResponse<any>;
+      if (!competitionCode) return null;
+      const response = await footballApi.getTeamsByCompetition(competitionCode);
+      return response.data as TeamsResponse;
     },
-    enabled: !!teamId,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
-  });
-};
-
-export const useTeamStatistics = (
-  leagueId: number | null,
-  teamId: number | null,
-  season: number = 2024
-) => {
-  return useQuery({
-    queryKey: ['team-stats', leagueId, teamId, season],
-    queryFn: async () => {
-      if (!leagueId || !teamId) return null;
-      const response = await footballApi.getTeamStatistics(leagueId, teamId, season);
-      return response.data as ApiResponse<any>;
-    },
-    enabled: !!leagueId && !!teamId,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 60000),
+    enabled: !!competitionCode,
+    staleTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours
+    retry: 1,
+    retryDelay: (attemptIndex) => Math.min(2000 * Math.pow(2, attemptIndex), 30000),
   });
 };
