@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import {
   Container,
-  Grid,
+
   Typography,
   Box,
   TextField,
@@ -12,6 +12,7 @@ import {
   InputAdornment,
   useTheme,
 } from '@mui/material';
+import { Grid as Grid2 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { PlayerCard } from '@/components/PlayerCard';
@@ -131,9 +132,9 @@ export default function PlayersPage() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <Grid container spacing={2}>
+                <Grid2 container spacing={2}>
                   {filteredPlayers.map((scorer: any, idx: number) => (
-                    <Grid item xs={12} sm={6} md={4} key={idx}>
+                    <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
                       <Card
                         sx={{
                           height: '100%',
@@ -201,9 +202,9 @@ export default function PlayersPage() {
                           </Box>
                         </CardContent>
                       </Card>
-                    </Grid>
+                    </Grid2>
                   ))}
-                </Grid>
+                </Grid2>
               </motion.div>
             ) : (
               <Card>

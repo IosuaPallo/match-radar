@@ -3,7 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import {
   Container,
-  Grid,
+
   Typography,
   Box,
   Tabs,
@@ -12,6 +12,7 @@ import {
   CardContent,
   useTheme,
 } from '@mui/material';
+import { Grid as Grid2 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { MatchCard } from '@/components/MatchCard';
@@ -143,13 +144,13 @@ export default function MatchesPage() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <Grid container spacing={2}>
+                <Grid2 container spacing={2}>
                   {data.matches.map((match) => (
-                    <Grid item xs={12} sm={6} md={4} key={match.id}>
+                    <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                       <MatchCard match={match} />
-                    </Grid>
+                    </Grid2>
                   ))}
-                </Grid>
+                </Grid2>
               </motion.div>
             ) : (
               <Card>

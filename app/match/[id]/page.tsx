@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import {
   Container,
-  Grid,
+
   Typography,
   Box,
   Card,
@@ -20,6 +20,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
+import { Grid as Grid2 } from '@mui/material';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -152,9 +153,9 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                 </Box>
 
                 {/* Match Score */}
-                <Grid container spacing={3} sx={{ mb: 3 }}>
+                <Grid2 container spacing={3} sx={{ mb: 3 }}>
                   {/* Home Team */}
-                  <Grid item xs={12} sm={5}>
+                  <Grid2 size={{ xs: 12, sm: 5 }}>
                     <Box sx={{ textAlign: 'center' }}>
                       {match.homeTeam.crest && (
                         <Image
@@ -169,10 +170,10 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                         {match.homeTeam.name}
                       </Typography>
                     </Box>
-                  </Grid>
+                  </Grid2>
 
                   {/* Score */}
-                  <Grid item xs={12} sm={2}>
+                  <Grid2 size={{ xs: 12, sm: 2 }}>
                     <Box sx={{ textAlign: 'center', py: 2 }}>
                       <Typography variant="h3" sx={{ fontWeight: 800, color: 'primary.main' }}>
                         {homeGoals !== null ? homeGoals : '-'}
@@ -184,10 +185,10 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                         {awayGoals !== null ? awayGoals : '-'}
                       </Typography>
                     </Box>
-                  </Grid>
+                  </Grid2>
 
                   {/* Away Team */}
-                  <Grid item xs={12} sm={5}>
+                  <Grid2 size={{ xs: 12, sm: 5 }}>
                     <Box sx={{ textAlign: 'center' }}>
                       {match.awayTeam.crest && (
                         <Image
@@ -202,8 +203,8 @@ export default function MatchDetailsPage({ params }: MatchDetailsPageProps) {
                         {match.awayTeam.name}
                       </Typography>
                     </Box>
-                  </Grid>
-                </Grid>
+                  </Grid2>
+                </Grid2>
 
                 {/* Match Info */}
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, pt: 3, borderTop: 1, borderColor: 'divider' }}>

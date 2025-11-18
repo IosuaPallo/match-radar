@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import {
   Container,
-  Grid,
+
   Typography,
   Box,
   Button,
@@ -12,6 +12,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
+import { Grid as Grid2 } from '@mui/material';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
@@ -164,13 +165,13 @@ export default function Home() {
                 {recentMatches.isLoading ? (
                   <MatchCardSkeleton count={3} />
                 ) : recentMatches.data?.matches?.length ? (
-                  <Grid container spacing={2}>
+                  <Grid2 container spacing={2}>
                     {recentMatches.data.matches.slice(0, 3).map((match) => (
-                      <Grid xs={12} sm={6} md={4} key={match.id}>
+                      <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                         <MatchCard match={match} />
-                      </Grid>
+                      </Grid2>
                     ))}
-                  </Grid>
+                  </Grid2>
                 ) : (
                   <Card>
                     <CardContent sx={{ textAlign: 'center', py: 4 }}>
@@ -217,13 +218,13 @@ export default function Home() {
                 {upcomingMatches.isLoading ? (
                   <MatchCardSkeleton count={3} />
                 ) : upcomingMatches.data?.matches?.length ? (
-                  <Grid container spacing={2}>
+                  <Grid2 container spacing={2}>
                     {upcomingMatches.data.matches.slice(0, 3).map((match) => (
-                      <Grid item xs={12} sm={6} md={4} key={match.id}>
+                      <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={match.id}>
                         <MatchCard match={match} />
-                      </Grid>
+                      </Grid2>
                     ))}
-                  </Grid>
+                  </Grid2>
                 ) : (
                   <Card>
                     <CardContent sx={{ textAlign: 'center', py: 4 }}>
@@ -270,9 +271,9 @@ export default function Home() {
                 {topScorers.isLoading ? (
                   <LoadingSkeleton count={3} type="card" />
                 ) : topScorers.data?.scorers?.length ? (
-                  <Grid container spacing={2}>
+                  <Grid2 container spacing={2}>
                     {topScorers.data.scorers.slice(0, 6).map((scorer: any, idx: number) => (
-                      <Grid item xs={12} sm={6} md={4} key={idx}>
+                      <Grid2 size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
                         <Card
                           sx={{
                             height: '100%',
@@ -330,9 +331,9 @@ export default function Home() {
                             </Box>
                           </CardContent>
                         </Card>
-                      </Grid>
+                      </Grid2>
                     ))}
-                  </Grid>
+                  </Grid2>
                 ) : (
                   <Card>
                     <CardContent sx={{ textAlign: 'center', py: 4 }}>
