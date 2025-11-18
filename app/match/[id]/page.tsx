@@ -20,7 +20,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import Grid2 from '@mui/material/Grid2';
+import { Grid as Grid2 } from '@mui/material';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
