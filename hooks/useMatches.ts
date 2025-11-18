@@ -34,6 +34,10 @@ export const useMatchDetails = (matchId: number | null) => {
       return response.data as ApiResponse<Match>;
     },
     enabled: !!matchId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };
 
@@ -46,6 +50,10 @@ export const useMatchLineups = (matchId: number | null) => {
       return response.data;
     },
     enabled: !!matchId,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };
 
@@ -58,5 +66,9 @@ export const useMatchStatistics = (matchId: number | null) => {
       return response.data;
     },
     enabled: !!matchId,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 20 * 60 * 1000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };
