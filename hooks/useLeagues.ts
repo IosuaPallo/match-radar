@@ -5,9 +5,16 @@ import { Competition, StandingResponse, ScorersResponse } from '@/lib/types';
 export const useCompetitions = () => {
   return useQuery({
     queryKey: ['competitions'],
-    queryFn: async () => {
-      const response = await footballApi.getCompetitions();
-      return response.data as { competitions: Competition[] };
+    queryFn: async ({ signal }) => {
+      try {
+        const response = await footballApi.getCompetitions(signal);
+        return response.data as { competitions: Competition[] };
+      } catch (error: any) {
+        if (error?.code === 'ECONNABORTED' || signal?.aborted) {
+          throw new Error('Request was cancelled');
+        }
+        throw error;
+      }
     },
     staleTime: 60 * 60 * 1000, // 1 hour
     gcTime: 24 * 60 * 60 * 1000, // 24 hours
@@ -19,10 +26,17 @@ export const useCompetitions = () => {
 export const useStandings = (competitionCode: string | null) => {
   return useQuery({
     queryKey: ['standings', competitionCode],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!competitionCode) return null;
-      const response = await footballApi.getStandingsByCompetition(competitionCode);
-      return response.data as StandingResponse;
+      try {
+        const response = await footballApi.getStandingsByCompetition(competitionCode, signal);
+        return response.data as StandingResponse;
+      } catch (error: any) {
+        if (error?.code === 'ECONNABORTED' || signal?.aborted) {
+          throw new Error('Request was cancelled');
+        }
+        throw error;
+      }
     },
     enabled: !!competitionCode,
     staleTime: 30 * 60 * 1000, // 30 minutes
@@ -35,10 +49,17 @@ export const useStandings = (competitionCode: string | null) => {
 export const useTopScorers = (competitionCode: string | null) => {
   return useQuery({
     queryKey: ['top-scorers', competitionCode],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!competitionCode) return null;
-      const response = await footballApi.getScorersByCompetition(competitionCode);
-      return response.data as ScorersResponse;
+      try {
+        const response = await footballApi.getScorersByCompetition(competitionCode, signal);
+        return response.data as ScorersResponse;
+      } catch (error: any) {
+        if (error?.code === 'ECONNABORTED' || signal?.aborted) {
+          throw new Error('Request was cancelled');
+        }
+        throw error;
+      }
     },
     enabled: !!competitionCode,
     staleTime: 30 * 60 * 1000, // 30 minutes
@@ -51,16 +72,23 @@ export const useTopScorers = (competitionCode: string | null) => {
 export const useTopAssists = (competitionCode: string | null) => {
   return useQuery({
     queryKey: ['top-assists', competitionCode],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!competitionCode) return null;
-      const response = await footballApi.getScorersByCompetition(competitionCode);
-      // Filter and sort by assists
-      const data = response.data as ScorersResponse;
-      const withAssists = data.scorers.filter((s) => s.assists && s.assists > 0);
-      return {
-        ...data,
-        scorers: withAssists.sort((a, b) => (b.assists || 0) - (a.assists || 0)),
-      };
+      try {
+        const response = await footballApi.getScorersByCompetition(competitionCode, signal);
+        // Filter and sort by assists
+        const data = response.data as ScorersResponse;
+        const withAssists = data.scorers.filter((s) => s.assists && s.assists > 0);
+        return {
+          ...data,
+          scorers: withAssists.sort((a, b) => (b.assists || 0) - (a.assists || 0)),
+        };
+      } catch (error: any) {
+        if (error?.code === 'ECONNABORTED' || signal?.aborted) {
+          throw new Error('Request was cancelled');
+        }
+        throw error;
+      }
     },
     enabled: !!competitionCode,
     staleTime: 30 * 60 * 1000, // 30 minutes
