@@ -15,13 +15,20 @@ export const useMatches = (params: UseMatchesParams = {}) => {
 
   return useQuery({
     queryKey: ['matches', params],
-    queryFn: async () => {
-      if (competitionCode) {
-        const response = await footballApi.getMatchesByCompetition(competitionCode, apiParams);
-        return response.data as MatchResponse;
-      } else {
-        const response = await footballApi.getMatches(apiParams);
-        return response.data as MatchResponse;
+    queryFn: async ({ signal }) => {
+      try {
+        if (competitionCode) {
+          const response = await footballApi.getMatchesByCompetition(competitionCode, apiParams, signal);
+          return response.data as MatchResponse;
+        } else {
+          const response = await footballApi.getMatches(apiParams, signal);
+          return response.data as MatchResponse;
+        }
+      } catch (error: any) {
+        if (error?.code === 'ECONNABORTED' || signal?.aborted) {
+          throw new Error('Request was cancelled');
+        }
+        throw error;
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -34,10 +41,17 @@ export const useMatches = (params: UseMatchesParams = {}) => {
 export const useMatchDetails = (matchId: number | null) => {
   return useQuery({
     queryKey: ['match', matchId],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!matchId) return null;
-      const response = await footballApi.getMatchDetails(matchId);
-      return response.data as Match;
+      try {
+        const response = await footballApi.getMatchDetails(matchId, signal);
+        return response.data as Match;
+      } catch (error: any) {
+        if (error?.code === 'ECONNABORTED' || signal?.aborted) {
+          throw new Error('Request was cancelled');
+        }
+        throw error;
+      }
     },
     enabled: !!matchId,
     staleTime: 5 * 60 * 1000,

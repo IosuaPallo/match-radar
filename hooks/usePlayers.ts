@@ -5,10 +5,17 @@ import { Person } from '@/lib/types';
 export const usePersonById = (personId: number | null) => {
   return useQuery({
     queryKey: ['person', personId],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       if (!personId) return null;
-      const response = await footballApi.getPersonById(personId);
-      return response.data as Person;
+      try {
+        const response = await footballApi.getPersonById(personId, signal);
+        return response.data as Person;
+      } catch (error: any) {
+        if (error?.code === 'ECONNABORTED' || signal?.aborted) {
+          throw new Error('Request was cancelled');
+        }
+        throw error;
+      }
     },
     enabled: !!personId,
     staleTime: 60 * 60 * 1000, // 1 hour
