@@ -19,6 +19,7 @@ import { MatchCardSkeleton } from '@/components/LoadingSkeleton';
 import { LeagueSelector } from '@/components/LeagueSelector';
 import { useMatches } from '@/hooks/useMatches';
 import { getDateRange } from '@/utils/date';
+import { Footer } from '@/components/Footer';
 
 const majorEuropeanLeagues = [
   { id: 39, name: 'Premier League' },
