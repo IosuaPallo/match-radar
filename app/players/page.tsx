@@ -21,28 +21,28 @@ import { Footer } from '@/components/Footer';
 import { Search } from '@mui/icons-material';
 
 const majorEuropeanLeagues = [
-  { id: 39, name: 'Premier League' },
-  { id: 140, name: 'La Liga' },
-  { id: 61, name: 'Ligue 1' },
-  { id: 78, name: 'Bundesliga' },
-  { id: 135, name: 'Serie A' },
-  { id: 2, name: 'Champions League' },
-  { id: 3, name: 'Europa League' },
+  { code: 'PL', name: 'Premier League' },
+  { code: 'PD', name: 'La Liga' },
+  { code: 'FL1', name: 'Ligue 1' },
+  { code: 'BL1', name: 'Bundesliga' },
+  { code: 'SA', name: 'Serie A' },
+  { code: 'CL', name: 'Champions League' },
+  { code: 'EL', name: 'Europa League' },
 ];
 
 export default function PlayersPage() {
   const theme = useTheme();
-  const [selectedLeague, setSelectedLeague] = useState<number>(39);
+  const [selectedLeague, setSelectedLeague] = useState<string>('PL');
   const [searchQuery, setSearchQuery] = useState('');
 
   const topScorers = useTopScorers(selectedLeague);
 
   const filteredPlayers = React.useMemo(() => {
-    if (!topScorers.data?.response) return [];
-    return topScorers.data.response.filter((player: any) =>
-      player.player?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    if (!topScorers.data?.scorers) return [];
+    return topScorers.data.scorers.filter((scorer: any) =>
+      scorer.player?.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [topScorers.data?.response, searchQuery]);
+  }, [topScorers.data?.scorers, searchQuery]);
 
   return (
     <Box sx={{ minHeight: '100vh', pb: 8 }}>
@@ -81,19 +81,19 @@ export default function PlayersPage() {
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   {majorEuropeanLeagues.map((league) => (
                     <Box
-                      key={league.id}
-                      onClick={() => setSelectedLeague(league.id)}
+                      key={league.code}
+                      onClick={() => setSelectedLeague(league.code)}
                       sx={{
                         px: 2,
                         py: 1,
                         borderRadius: 2,
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
-                        background: selectedLeague === league.id ? 'primary.main' : 'action.hover',
-                        color: selectedLeague === league.id ? 'primary.contrastText' : 'text.primary',
-                        fontWeight: selectedLeague === league.id ? 600 : 500,
+                        background: selectedLeague === league.code ? 'primary.main' : 'action.hover',
+                        color: selectedLeague === league.code ? 'primary.contrastText' : 'text.primary',
+                        fontWeight: selectedLeague === league.code ? 600 : 500,
                         '&:hover': {
-                          background: selectedLeague === league.id ? 'primary.dark' : 'action.selected',
+                          background: selectedLeague === league.code ? 'primary.dark' : 'action.selected',
                         },
                       }}
                     >
@@ -132,7 +132,7 @@ export default function PlayersPage() {
                 transition={{ duration: 0.3 }}
               >
                 <Grid container spacing={2}>
-                  {filteredPlayers.map((playerData: any, idx: number) => (
+                  {filteredPlayers.map((scorer: any, idx: number) => (
                     <Grid item xs={12} sm={6} md={4} key={idx}>
                       <Card
                         sx={{
@@ -165,13 +165,10 @@ export default function PlayersPage() {
                             </Box>
                             <Box sx={{ flex: 1 }}>
                               <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                                {playerData.player?.name}
+                                {scorer.player?.name}
                               </Typography>
                               <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
-                                {playerData.statistics?.[0]?.team?.name}
-                              </Typography>
-                              <Typography variant="caption" sx={{ opacity: 0.7, display: 'block' }}>
-                                {playerData.statistics?.[0]?.position || 'N/A'}
+                                {scorer.team?.name}
                               </Typography>
                             </Box>
                           </Box>
@@ -182,7 +179,7 @@ export default function PlayersPage() {
                                 Goals
                               </Typography>
                               <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                                {playerData.statistics?.[0]?.goals || 0}
+                                {scorer.goals || 0}
                               </Typography>
                             </Box>
                             <Box>
@@ -190,7 +187,7 @@ export default function PlayersPage() {
                                 Assists
                               </Typography>
                               <Typography variant="h5" sx={{ fontWeight: 700, color: 'secondary.main' }}>
-                                {playerData.statistics?.[0]?.assists || 0}
+                                {scorer.assists || 0}
                               </Typography>
                             </Box>
                             <Box>
@@ -198,7 +195,7 @@ export default function PlayersPage() {
                                 Matches
                               </Typography>
                               <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                                {playerData.statistics?.[0]?.games?.appearances || 0}
+                                {scorer.playedMatches || 0}
                               </Typography>
                             </Box>
                           </Box>
